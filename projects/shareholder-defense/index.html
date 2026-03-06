@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shareholder Defense — CubicleCreative</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #070a0f;
+      --green: #00ff9d;
+      --green-dim: #00ff9d33;
+      --green-mid: #00ff9d88;
+      --red: #ff3d3d;
+      --red-dim: #ff3d3d22;
+      --amber: #ffb800;
+      --text: #c8ffe0;
+      --muted: #3a5a47;
+      --border: #0d2a1a;
+      --surface: #080f0a;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Share Tech Mono', monospace;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* scanline overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.07) 2px,
+        rgba(0,0,0,0.07) 4px
+      );
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    /* ── HEADER ── */
+    .site-header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      padding: 0.9rem 1.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      z-index: 200;
+      background: var(--bg);
+    }
+
+    .site-logo {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.1em;
+    }
+
+    .back-link {
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.06em;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--green); }
+
+    /* ── SCREENS ── */
+    .screen {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 5rem 2rem 2rem;
+    }
+
+    /* ── INTRO SCREEN ── */
+    #intro-screen {
+      background: var(--bg);
+    }
+
+    .intro-top-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+      animation: fadeIn 0.5s 0.1s both;
+    }
+
+    .game-title {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(2rem, 6vw, 4rem);
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      color: var(--green);
+      text-shadow: 0 0 30px var(--green), 0 0 60px var(--green-dim);
+      text-align: center;
+      line-height: 1.1;
+      margin-bottom: 0.6rem;
+      animation: fadeIn 0.5s 0.2s both;
+    }
+
+    .game-subtitle {
+      font-size: 0.8rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      margin-bottom: 3rem;
+      animation: fadeIn 0.5s 0.3s both;
+    }
+
+    .briefing {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 1.6rem 2rem;
+      max-width: 500px;
+      width: 100%;
+      margin-bottom: 2.5rem;
+      animation: fadeIn 0.5s 0.4s both;
+    }
+
+    .briefing-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.6rem;
+    }
+
+    .briefing p {
+      font-size: 0.78rem;
+      color: #7aad90;
+      line-height: 1.9;
+      margin-bottom: 0.6rem;
+    }
+    .briefing p:last-child { margin-bottom: 0; }
+
+    .briefing strong { color: var(--green); }
+
+    .btn-start {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      background: transparent;
+      color: var(--green);
+      border: 1px solid var(--green);
+      padding: 0.9rem 3rem;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s;
+      animation: fadeIn 0.5s 0.5s both;
+    }
+    .btn-start:hover {
+      background: var(--green-dim);
+      box-shadow: 0 0 20px var(--green-dim);
+    }
+
+    /* ── GAME SCREEN ── */
+    #game-screen { display: none; padding: 0; }
+
+    canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+    }
+
+    /* HUD */
+    .hud {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      padding: 0.9rem 1.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 100;
+      pointer-events: none;
+      background: linear-gradient(to bottom, rgba(7,10,15,0.95) 0%, transparent 100%);
+    }
+
+    .hud-left {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .hud-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .hud-label {
+      font-size: 0.55rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .hud-value {
+      font-family: 'Orbitron', monospace;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--green);
+    }
+
+    /* Lives as shield icons */
+    .lives-row {
+      display: flex;
+      gap: 0.4rem;
+      align-items: center;
+    }
+
+    .life-icon {
+      width: 14px; height: 14px;
+      border: 1.5px solid var(--green);
+      transform: rotate(45deg);
+      background: var(--green-dim);
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .life-icon.lost {
+      border-color: var(--muted);
+      background: transparent;
+      opacity: 0.3;
+    }
+
+    /* Input bar */
+    .input-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      padding: 1rem 1.8rem 1.4rem;
+      background: linear-gradient(to top, rgba(7,10,15,0.98) 0%, transparent 100%);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      z-index: 100;
+    }
+
+    .input-prompt {
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    #type-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--green);
+      color: var(--green);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.1rem;
+      outline: none;
+      padding: 0.3rem 0;
+      caret-color: var(--green);
+      letter-spacing: 0.05em;
+    }
+
+    /* ── END SCREEN ── */
+    #end-screen {
+      display: none;
+      background: rgba(7,10,15,0.97);
+    }
+
+    .end-status {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(1.6rem, 5vw, 3rem);
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      color: var(--red);
+      text-shadow: 0 0 30px var(--red), 0 0 60px #ff3d3d22;
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .end-tagline {
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      margin-bottom: 2.5rem;
+    }
+
+    .score-board {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 1.4rem 2rem;
+      max-width: 400px;
+      width: 100%;
+      margin-bottom: 2.5rem;
+    }
+
+    .score-board-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+    }
+
+    .score-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      color: #7aad90;
+      padding: 0.3rem 0;
+    }
+
+    .score-row span:last-child {
+      color: var(--green);
+      font-family: 'Orbitron', monospace;
+      font-size: 0.8rem;
+    }
+
+    .end-buttons {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-retry {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      background: transparent;
+      color: var(--green);
+      border: 1px solid var(--green);
+      padding: 0.8rem 2.2rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-retry:hover { background: var(--green-dim); }
+
+    .btn-home {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 0.8rem 2.2rem;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+    }
+    .btn-home:hover { color: var(--text); border-color: var(--muted); }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes flash-red {
+      0%, 100% { background: var(--bg); }
+      50% { background: #1a0505; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── INTRO SCREEN ── -->
+<div class="screen" id="intro-screen">
+  <header class="site-header">
+    <a class="site-logo" href="../../index.html">CubicleCreative</a>
+    <a class="back-link" href="../../index.html">← Back</a>
+  </header>
+
+  <p class="intro-top-label">CubicleCreative // Game 01</p>
+  <h1 class="game-title">Shareholder<br/>Defense</h1>
+  <p class="game-subtitle">Type fast. Protect the bottom line.</p>
+
+  <div class="briefing">
+    <div class="briefing-label">Mission Briefing</div>
+    <p>Corporate buzzwords are <strong>falling from the sky</strong>. Type each word correctly to destroy it before it hits the ground.</p>
+    <p>You have <strong>3 lives</strong>. Each word that breaks through costs you one. Lose all three and the board loses confidence.</p>
+    <p>Words fall faster as your score climbs. <strong>Stay sharp.</strong></p>
+  </div>
+
+  <button class="btn-start" id="btn-start">DEPLOY →</button>
+</div>
+
+<!-- ── GAME SCREEN ── -->
+<div class="screen" id="game-screen">
+  <canvas id="game-canvas"></canvas>
+
+  <div class="hud">
+    <div class="hud-left">
+      <div class="hud-item">
+        <span class="hud-label">Score</span>
+        <span class="hud-value" id="hud-score">0</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">Destroyed</span>
+        <span class="hud-value" id="hud-killed">0</span>
+      </div>
+    </div>
+    <div class="hud-item" style="align-items:flex-end;">
+      <span class="hud-label">Shields</span>
+      <div class="lives-row" id="lives-row">
+        <div class="life-icon" id="life-2"></div>
+        <div class="life-icon" id="life-1"></div>
+        <div class="life-icon" id="life-0"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-bar">
+    <span class="input-prompt">&gt;_</span>
+    <input type="text" id="type-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="start typing..."/>
+  </div>
+</div>
+
+<!-- ── END SCREEN ── -->
+<div class="screen" id="end-screen">
+  <header class="site-header">
+    <a class="site-logo" href="../../index.html">CubicleCreative</a>
+    <a class="back-link" href="../../index.html">← Back</a>
+  </header>
+
+  <p class="end-status">BREACH DETECTED</p>
+  <p class="end-tagline">The shareholders are not pleased.</p>
+
+  <div class="score-board">
+    <div class="score-board-label">After-Action Report</div>
+    <div class="score-row"><span>Final Score</span><span id="end-score">0</span></div>
+    <div class="score-row"><span>Words Destroyed</span><span id="end-killed">0</span></div>
+    <div class="score-row"><span>Words Breached</span><span id="end-missed">0</span></div>
+    <div class="score-row"><span>Accuracy</span><span id="end-accuracy">0%</span></div>
+  </div>
+
+  <div class="end-buttons">
+    <button class="btn-retry" id="btn-retry">RETRY MISSION</button>
+    <a class="btn-home" href="../../index.html">← HOME BASE</a>
+  </div>
+</div>
+
+<script>
+(function () {
+
+  // ── Word bank ──────────────────────────────────────────────
+  const WORDS = [
+    "synergy","leverage","pivot","disrupt","scalable","agile",
+    "bandwidth","optimize","stakeholder","deliverable","ideate",
+    "monetize","iterate","paradigm","streamline","alignment",
+    "ecosystem","velocity","roadmap","traction","unicorn",
+    "blockchain","mission","vision","drill","cadence","circle",
+    "boil","ocean","needle","move","action","item","metrics",
+    "baseline","robust","holistic","proactive","empower","innovate",
+    "vertical","horizontal","interface","offshore","headcount",
+    "runway","bootstrap","valuation","equity","dilution",
+    "fiduciary","dividend","arbitrage","liquidity","volatility"
+  ];
+
+  // ── Canvas setup ───────────────────────────────────────────
+  const canvas = document.getElementById('game-canvas');
+  const ctx    = canvas.getContext('2d');
+
+  function resize() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // ── Game state ─────────────────────────────────────────────
+  let words      = [];
+  let score      = 0;
+  let killed     = 0;
+  let missed     = 0;
+  let lives      = 3;
+  let frameId    = null;
+  let lastSpawn  = 0;
+  let totalTyped = 0;
+  let totalCorrect = 0;
+  let gameRunning  = false;
+  let explosions   = [];
+  let particles    = [];
+
+  // DOM
+  const introScreen = document.getElementById('intro-screen');
+  const gameScreen  = document.getElementById('game-screen');
+  const endScreen   = document.getElementById('end-screen');
+  const typeInput   = document.getElementById('type-input');
+  const hudScore    = document.getElementById('hud-score');
+  const hudKilled   = document.getElementById('hud-killed');
+  const endScore    = document.getElementById('end-score');
+  const endKilled   = document.getElementById('end-killed');
+  const endMissed   = document.getElementById('end-missed');
+  const endAccuracy = document.getElementById('end-accuracy');
+
+  // ── Colour helpers ─────────────────────────────────────────
+  const GREEN      = '#00ff9d';
+  const GREEN_DIM  = 'rgba(0,255,157,0.15)';
+  const GREEN_MID  = 'rgba(0,255,157,0.5)';
+  const RED        = '#ff3d3d';
+  const AMBER      = '#ffb800';
+  const BG         = '#070a0f';
+
+  // ── Spawn word ─────────────────────────────────────────────
+  function spawnWord() {
+    const text   = WORDS[Math.floor(Math.random() * WORDS.length)];
+    const margin = 80;
+    const x      = margin + Math.random() * (canvas.width - margin * 2);
+    const speed  = 0.4 + (score / 800) * 0.6 + Math.random() * 0.3;
+    words.push({ text, x, y: 48, speed, typed: '', active: true });
+  }
+
+  // ── Spawn interval ─────────────────────────────────────────
+  function spawnInterval() {
+    return Math.max(1200, 2800 - score * 2);
+  }
+
+  // ── Explosion ─────────────────────────────────────────────
+  function createExplosion(x, y, text) {
+    // Ring
+    explosions.push({ x, y, r: 0, maxR: 60, alpha: 1, t: 0 });
+    // Particles
+    const count = 14;
+    for (let i = 0; i < count; i++) {
+      const angle = (i / count) * Math.PI * 2;
+      const speed = 1.5 + Math.random() * 2.5;
+      particles.push({
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        alpha: 1,
+        size: 2 + Math.random() * 3,
+        color: Math.random() > 0.5 ? GREEN : AMBER
+      });
+    }
+  }
+
+  // ── Draw ───────────────────────────────────────────────────
+  function draw(ts) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Background grid
+    ctx.strokeStyle = 'rgba(0,255,157,0.04)';
+    ctx.lineWidth = 1;
+    const gSize = 48;
+    for (let x = 0; x < canvas.width; x += gSize) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+    }
+    for (let y = 0; y < canvas.height; y += gSize) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+    }
+
+    // Danger zone line
+    const dangerY = canvas.height - 80;
+    ctx.strokeStyle = 'rgba(255,61,61,0.25)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([6, 6]);
+    ctx.beginPath(); ctx.moveTo(0, dangerY); ctx.lineTo(canvas.width, dangerY); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Turret base
+    const tx = canvas.width / 2;
+    const ty = canvas.height - 48;
+    ctx.strokeStyle = GREEN;
+    ctx.lineWidth = 2;
+    // base platform
+    ctx.strokeRect(tx - 30, ty + 4, 60, 18);
+    ctx.fillStyle = GREEN_DIM;
+    ctx.fillRect(tx - 30, ty + 4, 60, 18);
+    // barrel
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(tx, ty + 4); ctx.lineTo(tx, ty - 16); ctx.stroke();
+    // glow
+    ctx.shadowColor = GREEN;
+    ctx.shadowBlur  = 12;
+    ctx.strokeRect(tx - 30, ty + 4, 60, 18);
+    ctx.shadowBlur = 0;
+
+    // Words
+    const now = performance.now();
+    words.forEach(w => {
+      if (!w.active) return;
+
+      const fontSize = 16;
+      ctx.font = `${fontSize}px 'Share Tech Mono', monospace`;
+
+      // Highlight typed portion
+      const typedW  = ctx.measureText(w.typed).width;
+      const totalW  = ctx.measureText(w.text).width;
+      const startX  = w.x - totalW / 2;
+
+      // Background pill
+      ctx.fillStyle = 'rgba(7,10,15,0.75)';
+      ctx.fillRect(startX - 6, w.y - fontSize - 2, totalW + 12, fontSize + 8);
+
+      // Border — amber if near bottom
+      const danger = w.y > dangerY - 80;
+      ctx.strokeStyle = danger ? AMBER : GREEN_MID;
+      ctx.lineWidth = 1;
+      ctx.strokeRect(startX - 6, w.y - fontSize - 2, totalW + 12, fontSize + 8);
+
+      // Typed chars (bright green)
+      ctx.fillStyle = GREEN;
+      ctx.shadowColor = GREEN;
+      ctx.shadowBlur  = 8;
+      ctx.fillText(w.typed, startX, w.y);
+      ctx.shadowBlur = 0;
+
+      // Remaining chars
+      ctx.fillStyle = danger ? AMBER : 'rgba(0,255,157,0.45)';
+      ctx.fillText(w.text.slice(w.typed.length), startX + typedW, w.y);
+
+      // Laser beam if actively typing this word
+      if (w.typed.length > 0) {
+        const wordMidX = w.x;
+        const gradient = ctx.createLinearGradient(tx, ty, wordMidX, w.y);
+        gradient.addColorStop(0, 'rgba(0,255,157,0.6)');
+        gradient.addColorStop(1, 'rgba(0,255,157,0)');
+        ctx.strokeStyle = gradient;
+        ctx.lineWidth   = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(tx, ty);
+        ctx.lineTo(wordMidX, w.y);
+        ctx.stroke();
+      }
+    });
+
+    // Explosions
+    explosions = explosions.filter(e => e.alpha > 0);
+    explosions.forEach(e => {
+      e.r     += 3;
+      e.alpha -= 0.04;
+      ctx.beginPath();
+      ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(0,255,157,${e.alpha})`;
+      ctx.lineWidth   = 2;
+      ctx.stroke();
+      // inner flash
+      ctx.beginPath();
+      ctx.arc(e.x, e.y, e.r * 0.4, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,184,0,${e.alpha * 0.4})`;
+      ctx.fill();
+    });
+
+    // Particles
+    particles = particles.filter(p => p.alpha > 0);
+    particles.forEach(p => {
+      p.x    += p.vx;
+      p.y    += p.vy;
+      p.vy   += 0.05;
+      p.alpha -= 0.025;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fillStyle = p.color.replace(')', `,${p.alpha})`).replace('rgb', 'rgba');
+      ctx.fill();
+    });
+  }
+
+  // ── Update ─────────────────────────────────────────────────
+  function update(ts) {
+    if (!gameRunning) return;
+
+    // Spawn
+    if (ts - lastSpawn > spawnInterval()) {
+      spawnWord();
+      lastSpawn = ts;
+    }
+
+    // Move words
+    words.forEach(w => {
+      if (!w.active) return;
+      w.y += w.speed;
+
+      // Hit bottom
+      if (w.y > canvas.height - 60) {
+        w.active = false;
+        missed++;
+        lives--;
+        updateLives();
+        flashScreen();
+        if (lives <= 0) endGame();
+      }
+    });
+
+    // Clean inactive
+    words = words.filter(w => w.active);
+  }
+
+  // ── Game loop ──────────────────────────────────────────────
+  function loop(ts) {
+    update(ts);
+    draw(ts);
+    frameId = requestAnimationFrame(loop);
+  }
+
+  // ── Lives UI ───────────────────────────────────────────────
+  function updateLives() {
+    for (let i = 0; i < 3; i++) {
+      const el = document.getElementById(`life-${i}`);
+      if (el) el.classList.toggle('lost', i >= lives);
+    }
+  }
+
+  // ── Flash on miss ─────────────────────────────────────────
+  function flashScreen() {
+    document.body.style.animation = 'none';
+    document.body.offsetHeight; // reflow
+    document.body.style.background = '#1a0505';
+    setTimeout(() => { document.body.style.background = BG; }, 200);
+  }
+
+  // ── Typing ────────────────────────────────────────────────
+  typeInput.addEventListener('input', function () {
+    const val = this.value.trim().toLowerCase();
+    totalTyped++;
+
+    // Find best matching word (most typed prefix matched)
+    let best = null;
+    let bestLen = -1;
+    words.forEach(w => {
+      if (!w.active) return;
+      if (w.text.startsWith(val) && val.length > bestLen) {
+        best    = w;
+        bestLen = val.length;
+      }
+    });
+
+    // Update typed state on all words
+    words.forEach(w => { w.typed = ''; });
+    if (best && val.length > 0) best.typed = val;
+
+    // Check for complete match
+    if (best && val === best.text) {
+      createExplosion(best.x, best.y - 8, best.text);
+      best.active = false;
+      killed++;
+      totalCorrect++;
+      score += best.text.length * 10;
+      hudScore.textContent  = score;
+      hudKilled.textContent = killed;
+      this.value = '';
+    }
+  });
+
+  // ── Start game ─────────────────────────────────────────────
+  function startGame() {
+    words        = [];
+    explosions   = [];
+    particles    = [];
+    score        = 0;
+    killed       = 0;
+    missed       = 0;
+    lives        = 3;
+    totalTyped   = 0;
+    totalCorrect = 0;
+    gameRunning  = true;
+    lastSpawn    = performance.now() - 2000;
+
+    hudScore.textContent  = '0';
+    hudKilled.textContent = '0';
+    updateLives();
+
+    introScreen.style.display = 'none';
+    endScreen.style.display   = 'none';
+    gameScreen.style.display  = 'flex';
+
+    typeInput.value = '';
+    typeInput.focus();
+
+    if (frameId) cancelAnimationFrame(frameId);
+    frameId = requestAnimationFrame(loop);
+  }
+
+  // ── End game ───────────────────────────────────────────────
+  function endGame() {
+    gameRunning = false;
+    if (frameId) { cancelAnimationFrame(frameId); frameId = null; }
+
+    const total    = killed + missed;
+    const accuracy = total > 0 ? Math.round((killed / total) * 100) : 0;
+
+    endScore.textContent    = score;
+    endKilled.textContent   = killed;
+    endMissed.textContent   = missed;
+    endAccuracy.textContent = accuracy + '%';
+
+    gameScreen.style.display = 'none';
+    endScreen.style.display  = 'flex';
+  }
+
+  // ── Buttons ────────────────────────────────────────────────
+  document.getElementById('btn-start').addEventListener('click', startGame);
+  document.getElementById('btn-retry').addEventListener('click', startGame);
+
+  // Keep input focused during game
+  document.addEventListener('keydown', () => {
+    if (gameRunning) typeInput.focus();
+  });
+
+})();
+</script>
+</body>
+</html>
