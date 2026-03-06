@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CubicleCreative</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #111318;
+      --surface: #181b22;
+      --border: #23262f;
+      --text: #e8e8e6;
+      --muted: #6b6f7a;
+      --accent: #7eb8f7;
+      --subtle: #1e2128;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+
+    /* ── HEADER ── */
+    header {
+      padding: 2rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.3rem;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: 0.01em;
+    }
+
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 400;
+      margin-left: 2.5rem;
+      transition: color 0.2s;
+      letter-spacing: 0.02em;
+    }
+    nav a:hover { color: var(--text); }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 6rem 3rem 5rem;
+      max-width: 700px;
+      opacity: 0;
+      animation: fadeIn 0.7s 0.1s forwards;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.72rem;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.8rem;
+    }
+
+    h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2.4rem, 5vw, 3.8rem);
+      font-weight: 400;
+      line-height: 1.15;
+      color: var(--text);
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.01em;
+    }
+
+    .hero-sub {
+      font-size: 0.9rem;
+      line-height: 1.85;
+      color: var(--muted);
+      max-width: 420px;
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0 3rem;
+    }
+
+    /* ── PROJECTS ── */
+    .projects-section {
+      padding: 4rem 3rem 6rem;
+    }
+
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 2rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1px;
+      border: 1px solid var(--border);
+      background: var(--border);
+    }
+
+    .card {
+      background: var(--surface);
+      padding: 2.2rem 2rem;
+      text-decoration: none;
+      color: var(--text);
+      display: block;
+      transition: background 0.2s;
+      opacity: 0;
+      animation: fadeIn 0.5s forwards;
+    }
+
+    .card:nth-child(1) { animation-delay: 0.2s; }
+    .card:nth-child(2) { animation-delay: 0.3s; }
+    .card:nth-child(3) { animation-delay: 0.4s; }
+    .card:nth-child(4) { animation-delay: 0.5s; }
+
+    .card:hover { background: var(--subtle); }
+
+    .card-icon {
+      font-size: 1.6rem;
+      margin-bottom: 1.4rem;
+      display: block;
+    }
+
+    .card-number {
+      font-size: 0.65rem;
+      color: var(--border);
+      letter-spacing: 0.08em;
+      float: right;
+      margin-top: 0.1rem;
+    }
+
+    .card h3 {
+      font-family: 'DM Serif Display', serif;
+      font-weight: 400;
+      font-size: 1.15rem;
+      margin-bottom: 0.7rem;
+      letter-spacing: 0.01em;
+    }
+
+    .card p {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.75;
+      margin-bottom: 1.6rem;
+    }
+
+    .card-tag {
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .card:hover .card-tag { color: var(--accent); }
+
+    /* Coming soon */
+    .card.coming-soon {
+      opacity: 0.35 !important;
+      pointer-events: none;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 1.8rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 0.03em;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      header { padding: 1.4rem 1.5rem; }
+      .hero { padding: 3.5rem 1.5rem 3rem; }
+      .divider { margin: 0 1.5rem; }
+      .projects-section { padding: 3rem 1.5rem 4rem; }
+      footer { padding: 1.5rem; flex-direction: column; gap: 0.4rem; }
+      nav { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a class="logo" href="#">CubicleCreative</a>
+    <nav>
+      <a href="#projects">Projects</a>
+      <a href="#">About</a>
+      <a href="#">Contact</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <p class="hero-eyebrow">Interactive Experiments</p>
+    <h1>Built in a cubicle,<br/>shipped to the world.</h1>
+    <p class="hero-sub">A collection of games, tools, and interactive experiments — made for fun, curiosity, and the joy of clicking things.</p>
+  </section>
+
+  <hr class="divider"/>
+
+  <section class="projects-section" id="projects">
+    <p class="section-label">Projects</p>
+    <div class="grid">
+
+      <a class="card" href="projects/dino-game/index.html">
+        <span class="card-number">01</span>
+        <span class="card-icon">🦕</span>
+        <h3>Dino Jump</h3>
+        <p>A classic endless runner. Dodge obstacles, rack up your high score, and don't get squashed.</p>
+        <span class="card-tag">Game</span>
+      </a>
+
+      <a class="card" href="projects/clicker/index.html">
+        <span class="card-number">02</span>
+        <span class="card-icon">🖱️</span>
+        <h3>Countdown Clicker</h3>
+        <p>How many times can you click before time runs out? Simple, addictive, embarrassingly fun.</p>
+        <span class="card-tag">Game</span>
+      </a>
+
+      <a class="card" href="projects/money-counter/index.html">
+        <span class="card-number">03</span>
+        <span class="card-icon">💵</span>
+        <h3>Money Counter</h3>
+        <p>Watch your salary tick up in real time. Enter your annual pay and hours — it only counts during working hours.</p>
+        <span class="card-tag">Tool</span>
+      </a>
+
+      <div class="card coming-soon">
+        <span class="card-number">04</span>
+        <span class="card-icon">🔮</span>
+        <h3>Coming Soon</h3>
+        <p>Something new is being built. Check back soon.</p>
+        <span class="card-tag">???</span>
+      </div>
+
+    </div>
+  </section>
+
+  <footer>
+    <span>CubicleCreative — Personal Projects</span>
+    <span>Made with curiosity</span>
+  </footer>
+
+</body>
+</html>
