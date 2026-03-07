@@ -176,6 +176,37 @@
     .congrats-body strong { color:var(--green); }
     .congrats-body .sig { color:#2a4a35; font-size:0.7rem; margin-top:1rem; border-top:1px solid var(--border); padding-top:0.8rem; line-height:1.8; }
 
+    /* UPGRADE OVERLAY */
+    #upgrade-overlay { position:fixed; inset:0; background:rgba(7,10,15,0.93); display:none; align-items:center; justify-content:center; z-index:550; padding:2rem; }
+    #upgrade-overlay.visible { display:flex; }
+    .upgrade-box { border:1px solid var(--border); background:var(--surface); padding:2rem 2.2rem; max-width:600px; width:95%; }
+    .upgrade-title { font-family:'Orbitron',monospace; font-size:1rem; font-weight:900; color:var(--amber); letter-spacing:0.1em; margin-bottom:0.3rem; }
+    .upgrade-sub { font-size:0.68rem; color:var(--muted); letter-spacing:0.1em; margin-bottom:1.6rem; border-bottom:1px solid var(--border); padding-bottom:1rem; }
+    .upgrade-cards { display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:0; }
+    .upgrade-card { flex:1; min-width:220px; border:1px solid var(--border); background:var(--bg); padding:1.4rem 1.2rem; cursor:pointer; transition:border-color 0.2s, background 0.2s; }
+    .upgrade-card:hover { border-color:var(--amber); background:rgba(255,184,0,0.04); }
+    .upgrade-card-name { font-family:'Orbitron',monospace; font-size:0.75rem; font-weight:700; color:var(--amber); letter-spacing:0.08em; margin-bottom:0.6rem; }
+    .upgrade-card-type { font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); margin-bottom:0.8rem; }
+    .upgrade-card-desc { font-size:0.74rem; color:#7aad90; line-height:1.8; }
+    .upgrade-card-desc strong { color:var(--green); }
+
+    /* BOMB HUD ICON */
+    #bomb-icon { position:fixed; bottom:70px; right:20px; width:46px; height:46px;
+      border:2px solid var(--amber); background:rgba(255,184,0,0.1);
+      display:none; align-items:center; justify-content:center;
+      cursor:pointer; z-index:150; font-size:1.4rem;
+      transition:background 0.2s, box-shadow 0.2s; }
+    #bomb-icon:hover { background:rgba(255,184,0,0.25); box-shadow:0 0 14px var(--amber); }
+    #bomb-icon.active { display:flex; }
+    #bomb-label { position:fixed; bottom:118px; right:20px; font-size:0.55rem;
+      color:var(--amber); letter-spacing:0.1em; text-align:center; width:46px;
+      display:none; z-index:150; text-transform:uppercase; }
+    #bomb-label.active { display:block; }
+
+    /* UPGRADES HUD strip */
+    #upgrades-hud { position:fixed; bottom:70px; left:20px; display:flex; flex-direction:column; gap:4px; z-index:150; pointer-events:none; }
+    .upgrade-pip { font-size:0.6rem; color:var(--amber); letter-spacing:0.06em; opacity:0.7; }
+
     @keyframes fadeIn { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
   </style>
 </head>
@@ -248,6 +279,7 @@
     <div class="choice-btns">
       <button class="btn-choice" id="btn-join-board">JOIN THE BOARD →</button>
       <button class="btn-choice secondary" id="btn-lead-company">LEAD THE COMPANY →</button>
+      <button class="btn-choice" id="btn-blackmail" style="display:none;border-color:var(--red);color:var(--red);flex-basis:100%;">BLACKMAIL THE BOARD ▸</button>
     </div>
   </div>
 </div>
@@ -264,6 +296,22 @@
     <button class="btn-accept" id="btn-congrats-close">RETURN TO BASE →</button>
   </div>
 </div>
+
+<!-- UPGRADE OVERLAY -->
+<div id="upgrade-overlay">
+  <div class="upgrade-box">
+    <div class="upgrade-title" id="upgrade-title">CHOOSE YOUR UPGRADE</div>
+    <div class="upgrade-sub" id="upgrade-sub">Select one. It carries forward.</div>
+    <div class="upgrade-cards" id="upgrade-cards"></div>
+  </div>
+</div>
+
+<!-- BOMB ICON (Family Emergency) -->
+<div id="bomb-icon" title="Family Emergency — click to detonate">💼</div>
+<div id="bomb-label">EMERGENCY</div>
+
+<!-- ACTIVE UPGRADES HUD -->
+<div id="upgrades-hud"></div>
 
 <!-- GAME -->
 <div class="screen" id="game-screen">
@@ -344,7 +392,7 @@ const WORDS_L1 = [
 
 const WORDS_L2 = [
   "restructure","outsource","rightsizing","attrition","offshore","downsizing",
-  "performance","quarterly","shareholder","KPI","forecast","guidance",
+  "performance","quarterly","shareholder","KPI","OKR","forecast","guidance",
   "acquisition","divestiture","compliance","governance","fiduciary","leverage",
   "arbitrage","liquidity","volatility","equity","valuation","dilution","audit",
   "synergistic","diversify","benchmark","pipeline","throughput","scalability"
@@ -384,10 +432,10 @@ const BOSS_TAUNTS = [
 
 // ── LEVEL CONFIG ────────────────────────────────────────────────────────────
 const LEVELS = [
-  { num:1, name:"INTERN FLOOR",    scoreToNext:700,  speed:0.55, interval:2600, yellowChance:0,   wordBank: WORDS_L1 },
-  { num:2, name:"MIDDLE MANAGEMENT", scoreToNext:1500, speed:0.72, interval:2200, yellowChance:0.2, wordBank: WORDS_L2 },
-  { num:3, name:"EXECUTIVE SUITE", scoreToNext:2000, speed:0.90, interval:1900, yellowChance:0.28, wordBank: WORDS_L3 },
-  { num:4, name:"CEO BOSS BATTLE", scoreToNext:Infinity, speed:0.38, interval:1700, yellowChance:0.22, wordBank: WORDS_L3, isBoss:true }
+  { num:1, name:"INTERN FLOOR",    scoreToNext:1000,  speed:0.55, interval:2600, yellowChance:0,   wordBank: WORDS_L1 },
+  { num:2, name:"MIDDLE MANAGEMENT", scoreToNext:2000, speed:0.72, interval:2200, yellowChance:0.3, wordBank: WORDS_L2 },
+  { num:3, name:"EXECUTIVE SUITE", scoreToNext:3000, speed:0.90, interval:1900, yellowChance:0.4, wordBank: WORDS_L3 },
+  { num:4, name:"CEO BOSS BATTLE", scoreToNext:Infinity, speed:0.4, interval:1700, yellowChance:0.22, wordBank: WORDS_L3, isBoss:true }
 ];
 
 // ── CANVAS / CTX ────────────────────────────────────────────────────────────
@@ -403,6 +451,18 @@ let score=0, killed=0, missed=0, lives=3;
 let levelIndex=0, gameRunning=false, frameId=null, lastSpawn=0;
 let bossHP=0, bossMaxHP=0, bossX=0, bossY=80, bossDir=1, bossW=0, bossH=60;
 let bossDefeated=false;
+
+// Upgrades
+const upgrades = {
+  familyEmergency: false,   // bomb — one use, clears screen
+  dadWorkedHere:   false,   // chain explosion on destroy
+  prettyPrivilege: false,   // regen 1 life per 3 correct words
+  boardAlwaysWins: false,   // yellow words no longer penalise typing
+  dancedPresident: false,   // auto-crack red shell (no clicking needed)
+  dancedDevil:     false,   // secret ending enabler (does nothing else)
+};
+let bombAvailable = false;  // true once family emergency is used for this 'life'
+let wordsForRegen  = 0;     // counter for pretty privilege
 
 // ── DOM ──────────────────────────────────────────────────────────────────────
 const introScreen  = document.getElementById('intro-screen');
@@ -438,40 +498,152 @@ function showPopup(title, sub, bodyHTML, onClose){
   };
 }
 
+// ── UPGRADES ─────────────────────────────────────────────────────────────────
+function updateUpgradesHud(){
+  const hud = document.getElementById('upgrades-hud');
+  hud.innerHTML = '';
+  const active = [];
+  if(upgrades.dadWorkedHere)   active.push('⚡ My Dad Worked Here');
+  if(upgrades.prettyPrivilege) active.push('💗 Pretty Privilege');
+  if(upgrades.boardAlwaysWins) active.push('🛡 The Board Always Wins');
+  if(upgrades.dancedPresident) active.push('🤝 Danced With The President');
+  if(upgrades.dancedDevil)     active.push('😈 Danced With The Devil');
+  active.forEach(t => {
+    const d = document.createElement('div');
+    d.className = 'upgrade-pip';
+    d.textContent = t;
+    hud.appendChild(d);
+  });
+}
+
+function showUpgradeChoice(titleText, subText, optionA, optionB, onDone){
+  const overlay = document.getElementById('upgrade-overlay');
+  document.getElementById('upgrade-title').textContent = titleText;
+  document.getElementById('upgrade-sub').textContent   = subText;
+  const cards = document.getElementById('upgrade-cards');
+  cards.innerHTML = '';
+
+  [optionA, optionB].forEach(opt => {
+    const card = document.createElement('div');
+    card.className = 'upgrade-card';
+    card.innerHTML = `<div class="upgrade-card-name">${opt.name}</div>
+      <div class="upgrade-card-type">${opt.type}</div>
+      <div class="upgrade-card-desc">${opt.desc}</div>`;
+    card.addEventListener('click', () => {
+      overlay.classList.remove('visible');
+      opt.onPick();
+      updateUpgradesHud();
+      onDone();
+    });
+    cards.appendChild(card);
+  });
+
+  overlay.classList.add('visible');
+  gameRunning = false;
+}
+
 // ── LEVEL TRANSITION ─────────────────────────────────────────────────────────
 function advanceLevel(){
   levelIndex++;
   if(levelIndex >= LEVELS.length){ winGame(); return; }
   const lv = LEVELS[levelIndex];
-  words = []; // clear screen
+  words = [];
   hudLevel.textContent = lv.isBoss ? 'BOSS' : lv.num;
 
+  // After level 1 → 2: upgrade choice, THEN level 2 popup
   if(lv.num === 2){
-    showPopup(
-      'LEVEL 2 UNLOCKED',
-      lv.name,
-      `<strong>New threat detected.</strong><br><br>
-      <span class="amber">Yellow words</span> are anti-corporate agitators infiltrating the feed.<br><br>
-      <strong>Click them</strong> with your mouse to suppress them.<br><br>
-      <span style="color:var(--red)">⚠ Typing a yellow word will cost you a life.</span> Stay alert — you may need to switch between typing and clicking mid-stream.`,
-      null
+    showUpgradeChoice(
+      'END OF LEVEL 1 — CHOOSE AN ASSET',
+      'One upgrade. It follows you.',
+      {
+        name: 'Family Emergency',
+        type: '⚡ Active — One-Use Bomb',
+        desc: 'A <strong>briefcase icon</strong> appears in the corner. Click it once to <strong>clear every word on screen</strong>. Carries forward if unused.',
+        onPick: () => {
+          upgrades.familyEmergency = true;
+          bombAvailable = true;
+          document.getElementById('bomb-icon').classList.add('active');
+          document.getElementById('bomb-label').classList.add('active');
+        }
+      },
+      {
+        name: 'My Dad Worked Here',
+        type: '🔁 Passive — Chain Explosions',
+        desc: 'When you destroy a word, <strong>nearby words</strong> within a radius also detonate. The blast carries forward through every level.',
+        onPick: () => { upgrades.dadWorkedHere = true; }
+      },
+      () => {
+        showPopup(
+          'LEVEL 2 UNLOCKED', lv.name,
+          `<strong>New threat detected.</strong><br><br>
+          <span class="amber">Yellow words</span> are anti-corporate agitators infiltrating the feed.<br><br>
+          <strong>Click them</strong> with your mouse to suppress them.<br><br>
+          <span style="color:var(--red)">⚠ Typing a yellow word will cost you a life.</span>`,
+          null
+        );
+      }
     );
-  } else if(lv.isBoss){
-    initBoss();
-    showPopup(
-      'CEO BOSS BATTLE',
-      'FINAL CONFRONTATION',
-      `The CEO has entered the building.<br><br>
-      <span class="red">Red blinking words</span> are classified scandals — heavily shielded.<br><br>
-      <strong>Click them 3×</strong> to crack the shell, then <strong>type the word</strong> to destroy it.<br><br>
-      <span style="color:var(--red)">⚠ If a red word reaches the bottom, the game ends immediately.</span><br><br>
-      Destroy all red words and drain the CEO's HP to win.`,
-      null
+  }
+  // After level 2 → 3: upgrade choice, THEN level 3 popup
+  else if(lv.num === 3){
+    showUpgradeChoice(
+      'END OF LEVEL 2 — CHOOSE AN ASSET',
+      'One upgrade. It follows you.',
+      {
+        name: 'Pretty Privilege',
+        type: '💗 Passive — Regeneration',
+        desc: 'Every <strong>3 words destroyed correctly</strong>, you regenerate <strong>one life</strong> (up to the maximum of 3).',
+        onPick: () => { upgrades.prettyPrivilege = true; wordsForRegen = 0; }
+      },
+      {
+        name: 'The Board Always Wins',
+        type: '🛡 Passive — Yellow Immunity',
+        desc: 'Yellow words can be <strong>typed without penalty</strong>. Typing them destroys them as normal. Clicking still works too.',
+        onPick: () => { upgrades.boardAlwaysWins = true; }
+      },
+      () => {
+        showPopup(
+          'LEVEL 3 UNLOCKED', lv.name,
+          `You've climbed to the executive suite.<br><br>Words are <strong>faster</strong>, vocabulary is <strong>boardroom-grade</strong>. Keep typing.`,
+          null
+        );
+      }
     );
-  } else {
+  }
+  // After level 3 → boss: upgrade choice, THEN boss popup
+  else if(lv.isBoss){
+    showUpgradeChoice(
+      'FINAL UPGRADE BEFORE THE BOSS',
+      'Choose your weapon.',
+      {
+        name: "I've Danced With The President",
+        type: '🤝 Passive — Shell Breaker',
+        desc: '<strong>Red scandal words arrive pre-cracked.</strong> No clicking needed — just type them directly to destroy.',
+        onPick: () => { upgrades.dancedPresident = true; }
+      },
+      {
+        name: "I Know You've Danced With The Devil",
+        type: '😈 Passive — Hidden Leverage',
+        desc: 'Appears to do nothing. <strong>Those who know, know.</strong>',
+        onPick: () => { upgrades.dancedDevil = true; }
+      },
+      () => {
+        initBoss();
+        showPopup(
+          'CEO BOSS BATTLE', 'FINAL CONFRONTATION',
+          `The CEO has entered the building.<br><br>
+          <span class="red">Red blinking words</span> are classified scandals — heavily shielded.<br><br>
+          <strong>Click them 3×</strong> to crack the shell, then <strong>type the word</strong> to destroy it.<br><br>
+          <span style="color:var(--red)">⚠ If a red word reaches the bottom, the game ends immediately.</span><br><br>
+          Destroy all words and drain the CEO's HP to win.`,
+          null
+        );
+      }
+    );
+  }
+  else {
     showPopup(
-      `LEVEL ${lv.num} UNLOCKED`,
-      lv.name,
+      `LEVEL ${lv.num} UNLOCKED`, lv.name,
       `You've climbed the corporate ladder.<br><br>Words are <strong>faster</strong> and vocabulary is more <strong>executive-grade</strong>. Keep typing.`,
       null
     );
@@ -576,8 +748,8 @@ function spawnWord(){
 
   words.push({
     text, x, y: 140, speed, typed:'', active:true, type,
-    shellHP: type==='red' ? 3 : 0,   // clicks needed to crack
-    cracked: type==='red' ? false : true,  // can be typed once cracked
+    shellHP: type==='red' ? 3 : 0,
+    cracked: type==='red' ? (upgrades.dancedPresident ? true : false) : true,
     blinkPhase: Math.random() * Math.PI * 2
   });
 }
@@ -852,23 +1024,34 @@ typeInput.addEventListener('input', function(){
   let best=null, bestLen=-1;
   words.forEach(w => {
     if(!w.active || w.type === 'yellow') return;
-    if(w.type === 'red' && !w.cracked) return; // must be cracked first
+    if(w.type === 'red' && !w.cracked) return;
     if(w.text.startsWith(val) && val.length > bestLen){
       best=w; bestLen=val.length;
     }
   });
 
-  // Check if val matches a yellow word — penalise
+  // Yellow word typed — penalise unless boardAlwaysWins
   let typedYellow = false;
   words.forEach(w => {
     if(!w.active || w.type !== 'yellow') return;
     if(val === w.text){
       typedYellow = true;
       this.value = '';
-      lives--;
-      updateLives();
-      flashScreen('#1a1000');
-      if(lives <= 0) endGame(false);
+      if(upgrades.boardAlwaysWins){
+        // Destroy it for free
+        createExplosion(w.x, w.y-8, C.AMBER);
+        w.active = false;
+        killed++;
+        score += w.text.length * 8;
+        hudScore.textContent  = score;
+        hudKilled.textContent = killed;
+        onWordDestroyed(w.x, w.y);
+      } else {
+        lives--;
+        updateLives();
+        flashScreen('#1a1000');
+        if(lives <= 0) endGame(false);
+      }
     }
   });
   if(typedYellow) return;
@@ -884,9 +1067,43 @@ typeInput.addEventListener('input', function(){
     if(LEVELS[levelIndex].isBoss) bossHP = Math.max(0, bossHP - 1);
     hudScore.textContent  = score;
     hudKilled.textContent = killed;
+    onWordDestroyed(best.x, best.y);
     this.value = '';
   }
 });
+
+// Called whenever any word is successfully destroyed
+function onWordDestroyed(x, y){
+  // Pretty Privilege regen
+  if(upgrades.prettyPrivilege){
+    wordsForRegen++;
+    if(wordsForRegen >= 3 && lives < 3){
+      lives++;
+      wordsForRegen = 0;
+      updateLives();
+      flashScreen('#001a0a');
+    } else if(wordsForRegen >= 3){
+      wordsForRegen = 0; // reset even if full
+    }
+  }
+  // Chain explosion (My Dad Worked Here)
+  if(upgrades.dadWorkedHere){
+    const chainRadius = 110;
+    words.forEach(w => {
+      if(!w.active) return;
+      const dist = Math.hypot(w.x - x, w.y - y);
+      if(dist < chainRadius){
+        createExplosion(w.x, w.y-8, C.AMBER);
+        w.active = false;
+        killed++;
+        score += w.text.length * 5;
+        if(LEVELS[levelIndex].isBoss) bossHP = Math.max(0, bossHP - 1);
+      }
+    });
+    hudScore.textContent  = score;
+    hudKilled.textContent = killed;
+  }
+}
 
 // ── CANVAS CLICK (yellow & red shell) ────────────────────────────────────────
 canvas.addEventListener('click', function(e){
@@ -913,6 +1130,7 @@ canvas.addEventListener('click', function(e){
         if(LEVELS[levelIndex].isBoss) bossHP = Math.max(0, bossHP - 1);
         hudScore.textContent  = score;
         hudKilled.textContent = killed;
+        onWordDestroyed(w.x, w.y);
       } else if(w.type === 'red' && !w.cracked){
         w.shellHP--;
         createExplosion(w.x, w.y-8, C.RED);
@@ -932,6 +1150,14 @@ function startGame(){
   levelIndex=0; gameRunning=true;
   lastSpawn = performance.now() - 2500;
   bossDefeated = false;
+  wordsForRegen = 0;
+
+  // Reset upgrades
+  Object.keys(upgrades).forEach(k => upgrades[k] = false);
+  bombAvailable = false;
+  document.getElementById('bomb-icon').classList.remove('active');
+  document.getElementById('bomb-label').classList.remove('active');
+  updateUpgradesHud();
 
   hudScore.textContent  = '0';
   hudKilled.textContent = '0';
@@ -975,6 +1201,16 @@ function winGame(){
   gameRunning = false;
   if(frameId){ cancelAnimationFrame(frameId); frameId=null; }
   gameScreen.style.display = 'none';
+  // Reveal blackmail option if player has the secret upgrade
+  const blackmailBtn = document.getElementById('btn-blackmail');
+  if(upgrades.dancedDevil){
+    blackmailBtn.style.display = 'flex';
+    // Update choice email body to hint at a third option
+    document.querySelector('.choice-body p:nth-child(3)').innerHTML =
+      'The corner office is empty. The boardroom has a vacant chair. <strong>Both are yours to claim.</strong> And yet... you sense there may be a <span style="color:var(--red)">third path</span> entirely.';
+  } else {
+    blackmailBtn.style.display = 'none';
+  }
   document.getElementById('choice-overlay').classList.add('visible');
 }
 
@@ -987,29 +1223,54 @@ document.getElementById('btn-accept').addEventListener('click', startGame);
 document.getElementById('btn-retry').addEventListener('click', startGame);
 document.addEventListener('keydown', () => { if(gameRunning) typeInput.focus(); });
 
+// Bomb click
+document.getElementById('bomb-icon').addEventListener('click', () => {
+  if(!gameRunning || !bombAvailable) return;
+  // Clear all words
+  words.forEach(w => {
+    if(w.active) createExplosion(w.x, w.y-8, C.AMBER);
+  });
+  words = [];
+  bombAvailable = false;
+  document.getElementById('bomb-icon').classList.remove('active');
+  document.getElementById('bomb-label').classList.remove('active');
+  flashScreen('#1a1500');
+});
+
 // Choice buttons
 document.getElementById('btn-join-board').addEventListener('click', () => {
   document.getElementById('choice-overlay').classList.remove('visible');
-  const congrats = document.getElementById('congrats-overlay');
   document.getElementById('congrats-subject').textContent = 'Welcome to the Board';
   document.getElementById('congrats-body').innerHTML = `
     <p>An excellent choice. The corner office was always overrated — <strong>real power lives in this room.</strong></p>
     <p>You will never be seen. You will never be blamed. You will simply <strong>decide</strong>, and the world will move accordingly.</p>
     <p>Your first agenda item will arrive shortly. Until then, enjoy the silence. The Board does not celebrate — but if it did, <strong>this would be the occasion.</strong></p>
     <p class="sig">— Your Colleagues<br/>[ WELCOME. DO NOT SPEAK UNLESS SPOKEN TO. ]</p>`;
-  congrats.classList.add('visible');
+  document.getElementById('congrats-overlay').classList.add('visible');
 });
 
 document.getElementById('btn-lead-company').addEventListener('click', () => {
   document.getElementById('choice-overlay').classList.remove('visible');
-  const congrats = document.getElementById('congrats-overlay');
   document.getElementById('congrats-subject').textContent = 'The Corner Office Is Yours';
   document.getElementById('congrats-body').innerHTML = `
     <p>Bold. Ambitious. Possibly <strong>a little naive</strong> — but that has never stopped anyone at this level before.</p>
     <p>The company is yours to lead. The employees don't know what's coming. The press release is already written. Your first <strong>all-hands meeting</strong> has been scheduled for Monday.</p>
     <p>The Board will be watching, of course. We always are. But this is your moment. <strong>Do not waste it on altruism.</strong></p>
     <p class="sig">— The Board (Observing from a Distance)<br/>[ GOOD LUCK. YOU WILL NEED IT. ]</p>`;
-  congrats.classList.add('visible');
+  document.getElementById('congrats-overlay').classList.add('visible');
+});
+
+document.getElementById('btn-blackmail').addEventListener('click', () => {
+  document.getElementById('choice-overlay').classList.remove('visible');
+  document.getElementById('congrats-subject').textContent = 'You Run Everything Now';
+  document.getElementById('congrats-body').innerHTML = `
+    <p>We don't know how you obtained this information.</p>
+    <p>We don't know who you've spoken to, or what you've promised them. We don't know how long you've been planning this. What we <em>do</em> know is that <strong>every member of this Board has received your message</strong>, and that the vote was — in a first for this institution — <strong>unanimous.</strong></p>
+    <p>Effective immediately, you hold <strong>full authority</strong> over the company, the Board, its subsidiaries, its offshore accounts, and the three shell corporations we will not be naming here.</p>
+    <p>We will continue to show up to meetings. We will nod. We will clap at the appropriate moments. You will never see us resist. <strong>This is no longer our table.</strong></p>
+    <p>We trust you will be discreet. We have no choice but to trust you will be discreet.</p>
+    <p class="sig">— The Former Board<br/>[ CONGRATULATIONS. PLEASE DON'T. ]</p>`;
+  document.getElementById('congrats-overlay').classList.add('visible');
 });
 
 document.getElementById('btn-congrats-close').addEventListener('click', () => {
