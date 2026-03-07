@@ -7,64 +7,750 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg: #111318;
-      --surface: #181b22;
-      --border: #23262f;
-      --text: #e8e8e6;
-      --muted: #6b6f7a;
-      --accent: #7eb8f7;
-      --subtle: #1e2128;
-      --green: #4caf87;
-      --green-dim: #1d3028;
+      --bg: #111318; --surface: #181b22; --border: #23262f;
+      --text: #e8e8e6; --muted: #6b6f7a; --accent: #7eb8f7;
+      --subtle: #1e2128; --green: #4caf87; --green-dim: #1d3028;
+      --amber: #c9973a; --amber-dim: #2a1f0a;
     }
-
     html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; font-weight: 300; min-height: 100vh; }
 
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Inter', sans-serif;
-      font-weight: 300;
-      min-height: 100vh;
-    }
-
-    /* ── HEADER ── */
-    header {
-      padding: 2rem 3rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .logo {
-      font-family: 'DM Serif Display', serif;
-      font-size: 1.3rem;
-      color: var(--text);
-      text-decoration: none;
-    }
-
-    .back-link {
-      font-size: 0.78rem;
-      color: var(--muted);
-      text-decoration: none;
-      letter-spacing: 0.03em;
-      transition: color 0.2s;
-    }
+    header { padding: 2rem 3rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+    .logo { font-family: 'DM Serif Display', serif; font-size: 1.3rem; color: var(--text); text-decoration: none; }
+    .back-link { font-size: 0.78rem; color: var(--muted); text-decoration: none; letter-spacing: 0.03em; transition: color 0.2s; }
     .back-link:hover { color: var(--text); }
     .back-link::before { content: '← '; }
 
-    /* ── MAIN LAYOUT ── */
-    main {
-      max-width: 680px;
-      margin: 0 auto;
-      padding: 4rem 2rem 6rem;
+    main { max-width: 720px; margin: 0 auto; padding: 4rem 2rem 8rem; }
+
+    /* SETUP */
+    #setup-screen { opacity: 0; animation: fadeIn 0.6s 0.1s forwards; }
+    .eyebrow { font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.4rem; }
+    h1 { font-family: 'DM Serif Display', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; line-height: 1.15; margin-bottom: 0.8rem; }
+    .subtitle { font-size: 0.85rem; color: var(--muted); line-height: 1.8; margin-bottom: 3rem; max-width: 480px; }
+    .form-group { margin-bottom: 1.5rem; }
+    label { display: block; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.6rem; }
+    input[type="number"], input[type="text"] {
+      width: 100%; background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); font-family: 'Inter', sans-serif; font-size: 1rem;
+      font-weight: 300; padding: 0.85rem 1rem; outline: none; transition: border-color 0.2s;
+      -moz-appearance: textfield;
+    }
+    input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+    input[type="number"]:focus, input[type="text"]:focus { border-color: var(--accent); }
+    select { width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--text); font-family: 'Inter', sans-serif; font-size: 0.9rem; font-weight: 300; padding: 0.85rem 1rem; outline: none; transition: border-color 0.2s; cursor: pointer; }
+    select:focus { border-color: var(--accent); }
+
+    .assumptions { background: var(--surface); border: 1px solid var(--border); padding: 1.2rem 1.4rem; margin-bottom: 2rem; }
+    .assumptions-title { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
+    .assumptions-title span { transition: transform 0.2s; }
+    .assumptions-title.open span { transform: rotate(180deg); }
+    .assumptions-body { display: none; font-size: 0.78rem; color: var(--muted); line-height: 1.9; margin-top: 0.8rem; }
+    .assumptions-body.visible { display: block; }
+    .assumptions-body li { margin-left: 1rem; margin-bottom: 0.2rem; }
+
+    .btn-primary { width: 100%; background: var(--accent); color: #0d0f14; border: none; padding: 0.95rem 1rem; font-family: 'Inter', sans-serif; font-size: 0.82rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; margin-top: 0.5rem; }
+    .btn-primary:hover { opacity: 0.85; }
+    .btn-secondary { background: transparent; color: var(--muted); border: 1px solid var(--border); padding: 0.7rem 1.2rem; font-family: 'Inter', sans-serif; font-size: 0.75rem; font-weight: 400; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: color 0.2s, border-color 0.2s; }
+    .btn-secondary:hover { color: var(--text); border-color: var(--muted); }
+
+    /* DASHBOARD */
+    #dashboard-screen { display: none; }
+
+    .status-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2.5rem; flex-wrap: wrap; gap: 0.5rem; }
+    .status-pill { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.35rem 0.8rem; border: 1px solid var(--border); color: var(--muted); }
+    .status-pill.active { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); }
+    .status-pill.active .dot { background: var(--green); animation: pulse 2s infinite; }
+    .clock { font-size: 0.72rem; color: var(--muted); letter-spacing: 0.04em; font-variant-numeric: tabular-nums; }
+
+    /* MAIN COUNTER */
+    .counter-wrap { text-align: center; padding: 3rem 0 2.5rem; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin-bottom: 2.5rem; }
+    .counter-label { font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
+    #counter-display { font-family: 'DM Serif Display', serif; font-size: clamp(3rem, 10vw, 5.5rem); font-weight: 400; letter-spacing: -0.02em; color: var(--text); font-variant-numeric: tabular-nums; line-height: 1; margin-bottom: 0.8rem; transition: color 0.3s; }
+    #counter-display.ticking { color: var(--green); }
+    .per-second { font-size: 0.75rem; color: var(--muted); letter-spacing: 0.04em; }
+
+    /* METRICS */
+    .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); margin-bottom: 2.5rem; }
+    .metric { background: var(--surface); padding: 1.4rem 1.2rem; }
+    .metric-label { font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+    .metric-value { font-family: 'DM Serif Display', serif; font-size: 1.15rem; font-weight: 400; color: var(--text); font-variant-numeric: tabular-nums; }
+
+    /* YTD ROW */
+    .ytd-row { display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-top: 1px solid var(--border); font-size: 0.8rem; color: var(--muted); margin-bottom: 2.5rem; }
+    .ytd-time { font-variant-numeric: tabular-nums; letter-spacing: 0.03em; }
+
+    /* EDITABLE ASSUMPTIONS PANEL */
+    .assumptions-panel { border: 1px solid var(--border); background: var(--surface); margin-bottom: 2.5rem; }
+    .panel-header { padding: 1rem 1.4rem; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
+    .panel-header.open { border-bottom-color: var(--border); }
+    .panel-title { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+    .panel-chevron { font-size: 0.7rem; color: var(--muted); transition: transform 0.2s; }
+    .panel-header.open .panel-chevron { transform: rotate(180deg); }
+    .panel-body { display: none; padding: 1.4rem; }
+    .panel-body.open { display: block; }
+    .panel-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+    .panel-row:last-child { margin-bottom: 0; }
+    .panel-field label { font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; display: block; }
+    .panel-field input, .panel-field select { font-size: 0.85rem; padding: 0.6rem 0.8rem; }
+    .assumptions-note { font-size: 0.72rem; color: var(--muted); margin-top: 1rem; line-height: 1.7; padding-top: 1rem; border-top: 1px solid var(--border); }
+    .assumptions-note span { color: var(--accent); }
+
+    /* WIDGET SECTION */
+    .widgets-label { font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem; }
+    .widgets-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .widget { border: 1px solid var(--border); background: var(--surface); margin-bottom: 1rem; }
+    .widget-header { padding: 1rem 1.4rem; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; gap: 1rem; }
+    .widget-header-left { display: flex; flex-direction: column; gap: 0.2rem; }
+    .widget-name { font-size: 0.8rem; font-weight: 400; color: var(--text); letter-spacing: 0.02em; }
+    .widget-desc { font-size: 0.7rem; color: var(--muted); }
+    .widget-status { font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.25rem 0.6rem; border: 1px solid var(--border); color: var(--muted); white-space: nowrap; flex-shrink: 0; }
+    .widget-status.live { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+    .widget-status.amber { border-color: var(--amber); color: var(--amber); background: var(--amber-dim); }
+    .widget-body { display: none; border-top: 1px solid var(--border); padding: 1.4rem; }
+    .widget-body.open { display: block; }
+
+    /* Widget counter display */
+    .widget-counter { font-family: 'DM Serif Display', serif; font-size: clamp(1.6rem, 5vw, 2.8rem); font-weight: 400; color: var(--text); font-variant-numeric: tabular-nums; margin-bottom: 0.5rem; transition: color 0.3s; }
+    .widget-counter.ticking { color: var(--green); }
+    .widget-counter.amber { color: var(--amber); }
+    .widget-counter.offline { color: var(--muted); font-size: 1.2rem; font-family: 'Inter', sans-serif; font-weight: 300; }
+    .widget-sublabel { font-size: 0.72rem; color: var(--muted); margin-bottom: 1.2rem; }
+    .widget-inputs { display: grid; gap: 0.8rem; margin-bottom: 1rem; }
+    .widget-inputs.two-col { grid-template-columns: 1fr 1fr; }
+    .widget-field label { font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem; display: block; }
+    .widget-field input, .widget-field select { font-size: 0.85rem; padding: 0.6rem 0.8rem; }
+    .widget-btn { background: var(--accent); color: #0d0f14; border: none; padding: 0.65rem 1.4rem; font-family: 'Inter', sans-serif; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; }
+    .widget-btn:hover { opacity: 0.85; }
+    .widget-btn.stop { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+    .widget-btn.stop:hover { border-color: var(--muted); color: var(--text); }
+    .widget-btn-row { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; }
+    .widget-divider { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+    .widget-stat-row { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--muted); padding: 0.25rem 0; }
+    .widget-stat-row span:last-child { color: var(--text); font-variant-numeric: tabular-nums; }
+
+    .nav-row { margin-top: 2.5rem; }
+
+    footer { border-top: 1px solid var(--border); padding: 1.8rem 3rem; display: flex; align-items: center; justify-content: space-between; font-size: 0.72rem; color: var(--muted); letter-spacing: 0.03em; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.7); } }
+
+    @media (max-width: 600px) {
+      header { padding: 1.4rem 1.5rem; }
+      main { padding: 2.5rem 1.5rem 5rem; }
+      .metrics { grid-template-columns: 1fr 1fr; }
+      .panel-row { grid-template-columns: 1fr; }
+      .widget-inputs.two-col { grid-template-columns: 1fr; }
+      footer { padding: 1.5rem; flex-direction: column; gap: 0.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="../../index.html">CubicleCreative</a>
+  <a class="back-link" href="../../index.html">Back to Projects</a>
+</header>
+
+<main>
+
+  <!-- SETUP SCREEN — unchanged -->
+  <div id="setup-screen">
+    <p class="eyebrow">Tool</p>
+    <h1>Real-Time Income Counter</h1>
+    <p class="subtitle">Enter your salary and hours. Watch your earnings tick up in real time — only during working hours, Mon–Fri.</p>
+
+    <div class="form-group">
+      <label for="input-salary">Yearly Salary (USD)</label>
+      <input type="number" id="input-salary" placeholder="75000" min="0" step="1000"/>
+    </div>
+    <div class="form-group">
+      <label for="input-hours">Weekly Hours</label>
+      <input type="number" id="input-hours" placeholder="40" min="0" step="1"/>
+    </div>
+
+    <div class="assumptions">
+      <div class="assumptions-title" id="assumptions-toggle">Assumptions <span>▾</span></div>
+      <div class="assumptions-body" id="assumptions-body">
+        <ul>
+          <li>Workdays: Monday – Friday</li>
+          <li>Workday starts at 9:00 AM local time</li>
+          <li>Daily hours = Weekly hours ÷ 5</li>
+          <li>No holidays considered</li>
+          <li>Counter ticks only during working hours</li>
+        </ul>
+      </div>
+    </div>
+
+    <p id="setup-error" style="font-size:0.78rem;color:#f87171;margin-bottom:1rem;display:none;">Please enter a salary and weekly hours greater than zero.</p>
+    <button class="btn-primary" id="btn-start">Start Counter →</button>
+  </div>
+
+  <!-- DASHBOARD SCREEN -->
+  <div id="dashboard-screen">
+
+    <!-- Status + clock -->
+    <div class="status-bar">
+      <div class="status-pill" id="status-pill">
+        <div class="dot"></div>
+        <span id="status-text">Outside Working Hours</span>
+      </div>
+      <div class="clock" id="clock-display">--:--:-- --</div>
+    </div>
+
+    <!-- Main YTD counter -->
+    <div class="counter-wrap">
+      <div class="counter-label">Earned Year-to-Date (Working Hours)</div>
+      <div id="counter-display">$0.00</div>
+      <div class="per-second" id="per-second-label"></div>
+    </div>
+
+    <!-- Summary metrics -->
+    <div class="metrics">
+      <div class="metric">
+        <div class="metric-label">Yearly Salary</div>
+        <div class="metric-value" id="m-salary">—</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Weekly Hours</div>
+        <div class="metric-value" id="m-hours">—</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Hourly Rate</div>
+        <div class="metric-value" id="m-hourly">—</div>
+      </div>
+    </div>
+
+    <!-- YTD time -->
+    <div class="ytd-row">
+      <span>YTD Working Time Counted</span>
+      <span class="ytd-time" id="ytd-time">0h 0m 0s</span>
+    </div>
+
+    <!-- EDITABLE ASSUMPTIONS -->
+    <div class="assumptions-panel">
+      <div class="panel-header" id="assumptions-panel-toggle">
+        <span class="panel-title">Edit Assumptions</span>
+        <span class="panel-chevron">▾</span>
+      </div>
+      <div class="panel-body" id="assumptions-panel-body">
+        <div class="panel-row">
+          <div class="panel-field">
+            <label>Work Start Time</label>
+            <select id="edit-start-hour">
+              <option value="6">6:00 AM</option>
+              <option value="7">7:00 AM</option>
+              <option value="8">8:00 AM</option>
+              <option value="9" selected>9:00 AM</option>
+              <option value="10">10:00 AM</option>
+              <option value="11">11:00 AM</option>
+            </select>
+          </div>
+          <div class="panel-field">
+            <label>Weeks Per Year</label>
+            <input type="number" id="edit-weeks" value="52" min="1" max="52" step="1"/>
+          </div>
+        </div>
+        <div class="panel-row">
+          <div class="panel-field">
+            <label>Work Days Per Week</label>
+            <select id="edit-days">
+              <option value="4">4 days (Mon–Thu)</option>
+              <option value="5" selected>5 days (Mon–Fri)</option>
+              <option value="6">6 days (Mon–Sat)</option>
+            </select>
+          </div>
+          <div class="panel-field">
+            <label>Unpaid Holidays (days/yr)</label>
+            <input type="number" id="edit-holidays" value="0" min="0" max="50" step="1"/>
+          </div>
+        </div>
+        <div class="assumptions-note">
+          Changes apply <span>immediately</span> — all counters recalculate in real time.
+        </div>
+      </div>
+    </div>
+
+    <!-- WIDGETS -->
+    <div class="widgets-label">Additional Counters</div>
+
+    <!-- WIDGET 1: All-Time (clock time, not just work hours) -->
+    <div class="widget" id="widget-alltime">
+      <div class="widget-header" onclick="toggleWidget('alltime')">
+        <div class="widget-header-left">
+          <div class="widget-name">All-Time Earnings Counter</div>
+          <div class="widget-desc">Counts every second of the year, not just work hours</div>
+        </div>
+        <div class="widget-status" id="widget-alltime-status">Offline</div>
+      </div>
+      <div class="widget-body" id="widget-alltime-body">
+        <div class="widget-counter offline" id="widget-alltime-display">— Not started —</div>
+        <div class="widget-sublabel" id="widget-alltime-sub"></div>
+        <div class="widget-btn-row">
+          <button class="widget-btn" onclick="startWidget('alltime')">Start</button>
+          <button class="widget-btn stop" onclick="stopWidget('alltime')">Stop</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- WIDGET 2: Post-Tax Counter -->
+    <div class="widget" id="widget-posttax">
+      <div class="widget-header" onclick="toggleWidget('posttax')">
+        <div class="widget-header-left">
+          <div class="widget-name">Post-Tax Earnings</div>
+          <div class="widget-desc">YTD earnings after your effective tax rate</div>
+        </div>
+        <div class="widget-status" id="widget-posttax-status">Offline</div>
+      </div>
+      <div class="widget-body" id="widget-posttax-body">
+        <div class="widget-counter offline" id="widget-posttax-display">— Not started —</div>
+        <div class="widget-sublabel" id="widget-posttax-sub"></div>
+        <hr class="widget-divider"/>
+        <div class="widget-inputs">
+          <div class="widget-field">
+            <label>Effective Tax Rate (%)</label>
+            <input type="number" id="input-taxrate" placeholder="22" min="0" max="99" step="0.1"/>
+          </div>
+        </div>
+        <div class="widget-btn-row">
+          <button class="widget-btn" onclick="startWidget('posttax')">Start</button>
+          <button class="widget-btn stop" onclick="stopWidget('posttax')">Stop</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- WIDGET 3: Inflation-Adjusted (equivalent value in year X) -->
+    <div class="widget" id="widget-inflation">
+      <div class="widget-header" onclick="toggleWidget('inflation')">
+        <div class="widget-header-left">
+          <div class="widget-name">Inflation-Adjusted Value</div>
+          <div class="widget-desc">What your earnings are worth in a different year's dollars</div>
+        </div>
+        <div class="widget-status" id="widget-inflation-status">Offline</div>
+      </div>
+      <div class="widget-body" id="widget-inflation-body">
+        <div class="widget-counter offline" id="widget-inflation-display">— Not started —</div>
+        <div class="widget-sublabel" id="widget-inflation-sub"></div>
+        <hr class="widget-divider"/>
+        <div class="widget-inputs two-col">
+          <div class="widget-field">
+            <label>Reference Year</label>
+            <input type="number" id="input-refyear" placeholder="2000" min="1900" max="2100" step="1"/>
+          </div>
+          <div class="widget-field">
+            <label>Avg Annual Inflation (%)</label>
+            <input type="number" id="input-inflation" placeholder="3.0" min="0" max="50" step="0.1"/>
+          </div>
+        </div>
+        <div class="widget-btn-row">
+          <button class="widget-btn" onclick="startWidget('inflation')">Start</button>
+          <button class="widget-btn stop" onclick="stopWidget('inflation')">Stop</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- WIDGET 4: Daily / Weekly / Monthly Pace -->
+    <div class="widget" id="widget-pace">
+      <div class="widget-header" onclick="toggleWidget('pace')">
+        <div class="widget-header-left">
+          <div class="widget-name">Earnings Pace</div>
+          <div class="widget-desc">Projected earnings at your current rate for different periods</div>
+        </div>
+        <div class="widget-status" id="widget-pace-status">Offline</div>
+      </div>
+      <div class="widget-body" id="widget-pace-body">
+        <div id="widget-pace-display">
+          <div class="widget-stat-row"><span>Today (projected)</span><span id="pace-day">—</span></div>
+          <div class="widget-stat-row"><span>This week (projected)</span><span id="pace-week">—</span></div>
+          <div class="widget-stat-row"><span>This month (projected)</span><span id="pace-month">—</span></div>
+          <div class="widget-stat-row"><span>This quarter (projected)</span><span id="pace-quarter">—</span></div>
+        </div>
+        <div class="widget-sublabel" id="widget-pace-sub" style="margin-top:0.8rem"></div>
+        <hr class="widget-divider"/>
+        <div class="widget-btn-row">
+          <button class="widget-btn" onclick="startWidget('pace')">Start</button>
+          <button class="widget-btn stop" onclick="stopWidget('pace')">Stop</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- WIDGET 5: Time-to-Goal -->
+    <div class="widget" id="widget-goal">
+      <div class="widget-header" onclick="toggleWidget('goal')">
+        <div class="widget-header-left">
+          <div class="widget-name">Time to Goal</div>
+          <div class="widget-desc">How long until you've earned a target amount this year</div>
+        </div>
+        <div class="widget-status" id="widget-goal-status">Offline</div>
+      </div>
+      <div class="widget-body" id="widget-goal-body">
+        <div class="widget-counter offline" id="widget-goal-display">— Not started —</div>
+        <div class="widget-sublabel" id="widget-goal-sub"></div>
+        <hr class="widget-divider"/>
+        <div class="widget-inputs">
+          <div class="widget-field">
+            <label>Target Amount (USD)</label>
+            <input type="number" id="input-goal" placeholder="10000" min="0" step="100"/>
+          </div>
+        </div>
+        <div class="widget-btn-row">
+          <button class="widget-btn" onclick="startWidget('goal')">Start</button>
+          <button class="widget-btn stop" onclick="stopWidget('goal')">Stop</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-secondary" id="btn-back">← Back to Setup</button>
+    </div>
+
+  </div><!-- end dashboard -->
+</main>
+
+<footer>
+  <span>CubicleCreative — Money Counter</span>
+  <span>Made with curiosity</span>
+</footer>
+
+<script>
+(function () {
+
+  // ── CORE CALCULATION FUNCTIONS ────────────────────────────────────────────
+
+  function fmtCurrency(x) {
+    return '$' + x.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function workingWindowForDate(d, dailyHours, startHour, workDaysPerWeek) {
+    const dow = d.getDay(); // 0=Sun, 6=Sat
+    // For 5 days: Mon-Fri (1-5). For 4 days: Mon-Thu (1-4). For 6 days: Mon-Sat (1-6).
+    if (dow === 0) return null;
+    if (workDaysPerWeek === 4 && dow >= 5) return null;
+    if (workDaysPerWeek === 5 && dow === 6) return null;
+    const start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), startHour, 0, 0, 0);
+    const end = new Date(start.getTime() + dailyHours * 3600 * 1000);
+    return [start.getTime(), end.getTime()];
+  }
+
+  function workingMsUpTo(now, weeklyHours, startHour, weeksPerYear, workDaysPerWeek, holidayDays) {
+    if (weeklyHours <= 0) return 0;
+    const dailyHours = weeklyHours / workDaysPerWeek;
+    const yearStart = new Date(now.getFullYear(), 0, 1);
+    let total = 0;
+    const nowMs = now.getTime();
+    // Holiday deduction (spread evenly — subtract from end of calculation)
+    const d = new Date(yearStart);
+    let workdaysCounted = 0;
+    while (d <= now) {
+      const win = workingWindowForDate(d, dailyHours, startHour, workDaysPerWeek);
+      if (win) {
+        workdaysCounted++;
+        const [ws, we] = win;
+        if (nowMs >= we) total += we - ws;
+        else if (nowMs > ws) total += nowMs - ws;
+      }
+      d.setDate(d.getDate() + 1);
+    }
+    // Deduct holidays proportionally from time counted so far
+    const totalWorkdaysYear = weeksPerYear * workDaysPerWeek;
+    const holidayMsDeduction = (holidayDays / totalWorkdaysYear) * total;
+    return Math.max(0, total - holidayMsDeduction);
+  }
+
+  function isInWorkingWindow(now, weeklyHours, startHour, workDaysPerWeek) {
+    if (weeklyHours <= 0) return false;
+    const dailyHours = weeklyHours / workDaysPerWeek;
+    const win = workingWindowForDate(now, dailyHours, startHour, workDaysPerWeek);
+    if (!win) return false;
+    return now.getTime() >= win[0] && now.getTime() < win[1];
+  }
+
+  function hourlyRate(annualSalary, weeklyHours, weeksPerYear) {
+    if (weeklyHours <= 0 || weeksPerYear <= 0) return 0;
+    return annualSalary / (weeklyHours * weeksPerYear);
+  }
+
+  // ── STATE ────────────────────────────────────────────────────────────────
+  let annualSalary = 0, weeklyHours = 0;
+  let assumptions = { startHour: 9, weeksPerYear: 52, workDaysPerWeek: 5, holidayDays: 0 };
+  let rafId = null;
+
+  // Widget live state
+  const widgetState = {
+    alltime:   { live: false, taxRate: 0, refYear: 0, inflation: 0, goal: 0 },
+    posttax:   { live: false },
+    inflation: { live: false },
+    pace:      { live: false },
+    goal:      { live: false },
+  };
+
+  // ── DOM REFS ─────────────────────────────────────────────────────────────
+  const setupScreen    = document.getElementById('setup-screen');
+  const dashScreen     = document.getElementById('dashboard-screen');
+  const inputSalary    = document.getElementById('input-salary');
+  const inputHours     = document.getElementById('input-hours');
+  const btnStart       = document.getElementById('btn-start');
+  const btnBack        = document.getElementById('btn-back');
+  const setupError     = document.getElementById('setup-error');
+  const counterDisplay = document.getElementById('counter-display');
+  const perSecondLabel = document.getElementById('per-second-label');
+  const statusPill     = document.getElementById('status-pill');
+  const statusText     = document.getElementById('status-text');
+  const clockDisplay   = document.getElementById('clock-display');
+  const ytdTimeEl      = document.getElementById('ytd-time');
+  const mSalary        = document.getElementById('m-salary');
+  const mHours         = document.getElementById('m-hours');
+  const mHourly        = document.getElementById('m-hourly');
+
+  // ── SETUP SCREEN LOGIC ───────────────────────────────────────────────────
+  document.getElementById('assumptions-toggle').addEventListener('click', function () {
+    document.getElementById('assumptions-body').classList.toggle('visible');
+    this.classList.toggle('open');
+  });
+
+  btnStart.addEventListener('click', function () {
+    const sal = parseFloat(inputSalary.value);
+    const hrs = parseFloat(inputHours.value);
+    if (!sal || !hrs || sal <= 0 || hrs <= 0) {
+      setupError.style.display = 'block'; return;
+    }
+    setupError.style.display = 'none';
+    annualSalary = sal;
+    weeklyHours = hrs;
+    startDashboard();
+  });
+
+  btnBack.addEventListener('click', function () {
+    stopDashboard();
+    dashScreen.style.display = 'none';
+    setupScreen.style.display = 'block';
+  });
+
+  [inputSalary, inputHours].forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') btnStart.click(); });
+  });
+
+  // ── ASSUMPTIONS PANEL ────────────────────────────────────────────────────
+  document.getElementById('assumptions-panel-toggle').addEventListener('click', function () {
+    this.classList.toggle('open');
+    document.getElementById('assumptions-panel-body').classList.toggle('open');
+  });
+
+  function bindAssumptionInput(id, key, parser) {
+    document.getElementById(id).addEventListener('input', function () {
+      const val = parser(this.value);
+      if (!isNaN(val) && val > 0) {
+        assumptions[key] = val;
+        refreshMetrics();
+      }
+    });
+  }
+  bindAssumptionInput('edit-start-hour',  'startHour',       parseInt);
+  bindAssumptionInput('edit-weeks',        'weeksPerYear',    parseFloat);
+  bindAssumptionInput('edit-days',         'workDaysPerWeek', parseInt);
+
+  document.getElementById('edit-holidays').addEventListener('input', function () {
+    const val = parseFloat(this.value) || 0;
+    assumptions.holidayDays = Math.max(0, val);
+  });
+
+  // ── DASHBOARD START/STOP ──────────────────────────────────────────────────
+  function startDashboard() {
+    refreshMetrics();
+    setupScreen.style.display = 'none';
+    dashScreen.style.display = 'block';
+    tick();
+  }
+
+  function stopDashboard() {
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+  }
+
+  function refreshMetrics() {
+    const hr = hourlyRate(annualSalary, weeklyHours, assumptions.weeksPerYear);
+    mSalary.textContent = fmtCurrency(annualSalary);
+    mHours.textContent  = weeklyHours.toFixed(1) + ' hrs';
+    mHourly.textContent = fmtCurrency(hr);
+    perSecondLabel.textContent = fmtCurrency(hr / 3600) + ' per second';
+  }
+
+  // ── MAIN TICK ─────────────────────────────────────────────────────────────
+  function tick() {
+    const now = new Date();
+    const a = assumptions;
+    const hr = hourlyRate(annualSalary, weeklyHours, a.weeksPerYear);
+    const perSec = hr / 3600;
+    const inWork = isInWorkingWindow(now, weeklyHours, a.startHour, a.workDaysPerWeek);
+
+    // Clock
+    clockDisplay.textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+    // Status
+    statusPill.classList.toggle('active', inWork);
+    statusText.textContent = inWork ? 'Within Working Hours' : 'Outside Working Hours';
+
+    // Main YTD
+    const workMs = workingMsUpTo(now, weeklyHours, a.startHour, a.weeksPerYear, a.workDaysPerWeek, a.holidayDays);
+    const ytdEarnings = (workMs / 1000) * perSec;
+    counterDisplay.textContent = fmtCurrency(ytdEarnings);
+    counterDisplay.classList.toggle('ticking', inWork);
+
+    // YTD time
+    const totalSecs = Math.floor(workMs / 1000);
+    ytdTimeEl.textContent = `${Math.floor(totalSecs/3600)}h ${Math.floor((totalSecs%3600)/60)}m ${totalSecs%60}s`;
+
+    // Widgets
+    tickWidgets(now, ytdEarnings, perSec, inWork);
+
+    rafId = requestAnimationFrame(tick);
+  }
+
+  // ── WIDGET HELPERS ────────────────────────────────────────────────────────
+  window.toggleWidget = function(id) {
+    const body = document.getElementById('widget-' + id + '-body');
+    body.classList.toggle('open');
+  };
+
+  window.startWidget = function(id) {
+    const inputs = getWidgetInputs(id);
+    if (!inputs.valid) { alert(inputs.error); return; }
+    widgetState[id] = { ...widgetState[id], live: true, ...inputs.values };
+    document.getElementById('widget-' + id + '-status').textContent = 'Live';
+    document.getElementById('widget-' + id + '-status').classList.add('live');
+    document.getElementById('widget-' + id + '-body').classList.add('open');
+  };
+
+  window.stopWidget = function(id) {
+    widgetState[id].live = false;
+    document.getElementById('widget-' + id + '-status').textContent = 'Paused';
+    document.getElementById('widget-' + id + '-status').classList.remove('live');
+    document.getElementById('widget-' + id + '-status').classList.add('amber');
+    const el = document.getElementById('widget-' + id + '-display');
+    if (el) el.classList.add('offline');
+  };
+
+  function getWidgetInputs(id) {
+    if (id === 'posttax') {
+      const rate = parseFloat(document.getElementById('input-taxrate').value);
+      if (isNaN(rate) || rate < 0 || rate >= 100) return { valid: false, error: 'Enter a valid tax rate (0–99%).' };
+      return { valid: true, values: { taxRate: rate } };
+    }
+    if (id === 'inflation') {
+      const refYear  = parseInt(document.getElementById('input-refyear').value);
+      const inflation = parseFloat(document.getElementById('input-inflation').value);
+      if (isNaN(refYear) || refYear < 1900) return { valid: false, error: 'Enter a valid reference year.' };
+      if (isNaN(inflation) || inflation < 0) return { valid: false, error: 'Enter a valid inflation rate.' };
+      return { valid: true, values: { refYear, inflation } };
+    }
+    if (id === 'goal') {
+      const goal = parseFloat(document.getElementById('input-goal').value);
+      if (isNaN(goal) || goal <= 0) return { valid: false, error: 'Enter a goal amount greater than zero.' };
+      return { valid: true, values: { goal } };
+    }
+    return { valid: true, values: {} };
+  }
+
+  // ── WIDGET TICK ───────────────────────────────────────────────────────────
+  function tickWidgets(now, ytdEarnings, perSec, inWork) {
+    const a = assumptions;
+
+    // ALL-TIME
+    if (widgetState.alltime.live) {
+      const yearStart  = new Date(now.getFullYear(), 0, 1);
+      const elapsedSec = (now - yearStart) / 1000;
+      const secPerYear = a.weeksPerYear * a.workDaysPerWeek * (weeklyHours / a.workDaysPerWeek) * 3600;
+      const allTimeEarnings = (elapsedSec / secPerYear) * annualSalary;
+      const el = document.getElementById('widget-alltime-display');
+      el.textContent = fmtCurrency(allTimeEarnings);
+      el.classList.remove('offline');
+      el.classList.toggle('ticking', true);
+      document.getElementById('widget-alltime-sub').textContent =
+        `Counting all ${Math.floor(elapsedSec/3600)}h elapsed since Jan 1`;
     }
 
-    /* ── SETUP SCREEN ── */
-    #setup-screen {
+    // POST-TAX
+    if (widgetState.posttax.live) {
+      const rate = widgetState.posttax.taxRate;
+      const postTax = ytdEarnings * (1 - rate / 100);
+      const el = document.getElementById('widget-posttax-display');
+      el.textContent = fmtCurrency(postTax);
+      el.classList.remove('offline');
+      el.classList.toggle('ticking', inWork);
+      document.getElementById('widget-posttax-sub').textContent =
+        `After ${rate}% effective tax — ${fmtCurrency(ytdEarnings - postTax)} withheld YTD`;
+    }
+
+    // INFLATION-ADJUSTED
+    if (widgetState.inflation.live) {
+      const { refYear, inflation } = widgetState.inflation;
+      const currentYear = now.getFullYear();
+      const yearDiff = currentYear - refYear;
+      // If refYear is in the past, your money is worth less in refYear dollars
+      // If refYear is in the future, your money is worth more in refYear dollars
+      const factor = Math.pow(1 + inflation / 100, yearDiff);
+      const adjusted = yearDiff >= 0 ? ytdEarnings / factor : ytdEarnings * Math.abs(factor);
+      const el = document.getElementById('widget-inflation-display');
+      el.textContent = fmtCurrency(adjusted);
+      el.classList.remove('offline');
+      el.classList.toggle('amber', true);
+      const dir = yearDiff >= 0 ? `worth less than` : `worth more than`;
+      document.getElementById('widget-inflation-sub').textContent =
+        `In ${refYear} dollars (${inflation}% avg inflation) — your earnings are ${dir} today`;
+    }
+
+    // PACE
+    if (widgetState.pace.live) {
+      const dailyHours = weeklyHours / a.workDaysPerWeek;
+      const dailyRate  = perSec * dailyHours * 3600;
+      const weeklyRate = dailyRate * a.workDaysPerWeek;
+      const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+      const workdaysInMonth = Math.round(daysInMonth / 7 * a.workDaysPerWeek);
+      document.getElementById('pace-day').textContent     = fmtCurrency(dailyRate);
+      document.getElementById('pace-week').textContent    = fmtCurrency(weeklyRate);
+      document.getElementById('pace-month').textContent   = fmtCurrency(dailyRate * workdaysInMonth);
+      document.getElementById('pace-quarter').textContent = fmtCurrency(weeklyRate * 13);
+      document.getElementById('widget-pace-sub').textContent =
+        `Based on ${fmtCurrency(perSec)} / sec × active work hours`;
+      document.getElementById('widget-pace-status').classList.add('live');
+    }
+
+    // TIME TO GOAL
+    if (widgetState.goal.live) {
+      const goal = widgetState.goal.goal;
+      const el = document.getElementById('widget-goal-display');
+      if (ytdEarnings >= goal) {
+        el.textContent = '✓ Goal Reached';
+        el.classList.remove('offline');
+        el.style.color = 'var(--green)';
+        document.getElementById('widget-goal-sub').textContent = `You've already earned ${fmtCurrency(ytdEarnings)} this year.`;
+      } else {
+        const remaining = goal - ytdEarnings;
+        // How many working seconds remain to earn that?
+        if (perSec > 0) {
+          const secsNeeded = remaining / perSec;
+          const hh = Math.floor(secsNeeded / 3600);
+          const mm = Math.floor((secsNeeded % 3600) / 60);
+          const ss = Math.floor(secsNeeded % 60);
+          el.textContent = `${hh}h ${mm}m ${ss}s`;
+          el.classList.remove('offline');
+          el.classList.toggle('ticking', inWork);
+          document.getElementById('widget-goal-sub').textContent =
+            `${fmtCurrency(remaining)} to go until ${fmtCurrency(goal)}`;
+        }
+      }
+    }
+  }
+
+  // ── PANEL TOGGLE ─────────────────────────────────────────────────────────
+
+})();
+</script>
+</body>
+</html>    #setup-screen {
       opacity: 0;
       animation: fadeIn 0.6s 0.1s forwards;
     }
