@@ -253,7 +253,7 @@ window.fetchAll = async function(){
   Object.keys(enabled).forEach(k => setChipState(k, 'loading'));
 
   try {
-    const res  = await fetch(workerUrl + '/feed?source=all', {signal: AbortSignal.timeout(20000)});
+    const res  = await fetch(workerUrl + '/feed', {signal: AbortSignal.timeout(20000)});
     if(!res.ok) throw new Error('Worker returned HTTP ' + res.status);
     const data = await res.json();
     if(!data.ok) throw new Error(data.error || 'Worker error');
@@ -303,7 +303,7 @@ function renderAll(){
   visible.sort(function(a,b){
     if(!a.time && !b.time) return 0;
     if(!a.time) return 1; if(!b.time) return -1;
-    return new Date(b.time) - new Date(a.time);
+    return new Date(b.time).getTime() - new Date(a.time).getTime();
   });
 
   // Group by sourceLabel
@@ -387,6 +387,9 @@ function relTime(d){
 function esc(s){
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+fetchAll();
 
 })();
 </script>
