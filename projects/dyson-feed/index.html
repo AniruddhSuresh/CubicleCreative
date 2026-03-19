@@ -4,413 +4,117 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dyson Signal — CubicleCreative</title>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg: #0a0a0b;
-      --surface: #111113;
-      --surface2: #18181c;
-      --border: #222226;
-      --text: #f0f0ee;
-      --muted: #666672;
-      --accent: #c8f542;      /* electric lime */
-      --accent2: #f5a623;     /* amber */
-      --red: #ff4545;
-      --blue: #4599ff;
-      --mono: 'Space Mono', monospace;
-      --sans: 'Syne', sans-serif;
+      --bg: #0a0a0b; --surface: #111113; --surface2: #18181c; --border: #222226;
+      --text: #f0f0ee; --muted: #666672; --accent: #c8f542; --accent2: #f5a623;
+      --red: #ff4545; --blue: #4599ff; --purple: #a855f7; --teal: #6ee7b7;
+      --mono: 'Space Mono', monospace; --sans: 'Syne', sans-serif;
     }
-
     html { scroll-behavior: smooth; }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--mono);
-      font-size: 14px;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    /* Noise overlay */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 9999;
-      opacity: 0.4;
-    }
+    body { background: var(--bg); color: var(--text); font-family: var(--mono); font-size: 14px; min-height: 100vh; overflow-x: hidden; }
 
     /* ── HEADER ── */
-    .header {
-      padding: 2rem 3rem 1.5rem;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
+    .header { padding: 2rem 3rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
     .header-left { display: flex; flex-direction: column; gap: 0.3rem; }
-
-    .back-link {
-      font-family: var(--mono);
-      font-size: 0.7rem;
-      color: var(--muted);
-      text-decoration: none;
-      letter-spacing: 0.06em;
-      transition: color 0.15s;
-      margin-bottom: 0.4rem;
-      display: inline-block;
-    }
+    .back-link { font-size: 0.7rem; color: var(--muted); text-decoration: none; letter-spacing: 0.06em; transition: color 0.15s; margin-bottom: 0.4rem; display: inline-block; }
     .back-link:hover { color: var(--accent); }
+    .site-title { font-family: var(--sans); font-size: clamp(1.6rem,4vw,2.4rem); font-weight: 800; line-height: 1; letter-spacing: -0.02em; }
+    .site-title span { color: var(--accent); }
+    .tagline { font-size: 0.68rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 0.4rem; }
+    .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem; }
+    .live-badge { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); border: 1px solid var(--accent); padding: 0.3rem 0.7rem; }
+    .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: blink 1.6s ease-in-out infinite; }
+    .last-updated { font-size: 0.62rem; color: var(--muted); letter-spacing: 0.04em; }
 
-    .site-title {
-      font-family: var(--sans);
-      font-size: clamp(1.6rem, 4vw, 2.4rem);
-      font-weight: 800;
-      color: var(--text);
-      line-height: 1;
-      letter-spacing: -0.02em;
+    /* ── WORKER URL BANNER ── */
+    #worker-banner {
+      background: rgba(200,245,66,0.06); border-bottom: 1px solid rgba(200,245,66,0.2);
+      padding: 0.7rem 3rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
     }
-
-    .site-title span {
-      color: var(--accent);
+    #worker-banner label { font-size: 0.65rem; color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; }
+    #worker-url-input {
+      flex: 1; min-width: 260px; background: transparent; border: 1px solid rgba(200,245,66,0.3);
+      color: var(--text); font-family: var(--mono); font-size: 0.72rem; padding: 0.4rem 0.8rem;
+      outline: none; transition: border-color 0.2s;
     }
-
-    .tagline {
-      font-family: var(--mono);
-      font-size: 0.68rem;
-      color: var(--muted);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      margin-top: 0.4rem;
-    }
-
-    .header-right {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 0.5rem;
-    }
-
-    .live-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-family: var(--mono);
-      font-size: 0.65rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--accent);
-      border: 1px solid var(--accent);
-      padding: 0.3rem 0.7rem;
-    }
-
-    .live-dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-      animation: blink 1.6s ease-in-out infinite;
-    }
-
-    .last-updated {
-      font-size: 0.62rem;
-      color: var(--muted);
-      letter-spacing: 0.04em;
-    }
+    #worker-url-input:focus { border-color: var(--accent); }
+    #worker-url-input::placeholder { color: var(--muted); }
+    .btn-set-worker { font-family: var(--mono); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; background: var(--accent); color: #0a0a0b; border: none; padding: 0.45rem 1rem; cursor: pointer; transition: opacity 0.2s; white-space: nowrap; }
+    .btn-set-worker:hover { opacity: 0.85; }
+    #worker-status { font-size: 0.62rem; color: var(--muted); }
+    #worker-status.ok { color: var(--accent); }
+    #worker-status.err { color: var(--red); }
 
     /* ── SOURCES BAR ── */
-    .sources-bar {
-      padding: 0.8rem 3rem;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      align-items: center;
-      background: var(--surface);
-    }
-
-    .sources-label {
-      font-size: 0.62rem;
-      color: var(--muted);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-right: 0.5rem;
-    }
-
-    .source-chip {
-      font-size: 0.62rem;
-      letter-spacing: 0.06em;
-      padding: 0.2rem 0.55rem;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: all 0.15s;
-      background: var(--bg);
-      user-select: none;
-    }
-
-    .source-chip:hover { border-color: var(--muted); color: var(--text); }
+    .sources-bar { padding: 0.8rem 3rem; border-bottom: 1px solid var(--border); display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; background: var(--surface); }
+    .sources-label { font-size: 0.62rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-right: 0.5rem; }
+    .source-chip { font-size: 0.62rem; letter-spacing: 0.06em; padding: 0.2rem 0.55rem; border: 1px solid var(--border); color: var(--muted); text-transform: uppercase; cursor: pointer; transition: all 0.15s; background: var(--bg); user-select: none; }
     .source-chip.active { border-color: var(--accent); color: var(--accent); background: rgba(200,245,66,0.06); }
-    .source-chip.loading { border-color: var(--accent2); color: var(--accent2); animation: chipPulse 1s ease-in-out infinite; }
-    .source-chip.error { border-color: var(--red); color: var(--red); }
-    .source-chip.ok { border-color: var(--accent); color: var(--accent); background: rgba(200,245,66,0.06); }
+    .source-chip.ok     { border-color: var(--accent); color: var(--accent); background: rgba(200,245,66,0.06); }
+    .source-chip.loading{ border-color: var(--accent2); color: var(--accent2); animation: chipPulse 1s ease-in-out infinite; }
+    .source-chip.error  { border-color: var(--red); color: var(--red); }
 
-    /* ── MAIN GRID ── */
-    main {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem 2rem 6rem;
-    }
-
-    /* ── FEED GRID ── */
-    .feed-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-      gap: 1px;
-      background: var(--border);
-      border: 1px solid var(--border);
-      margin-bottom: 2rem;
-    }
-
-    /* ── CARD ── */
-    .card {
-      background: var(--surface);
-      padding: 1.4rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.7rem;
-      transition: background 0.15s;
-      position: relative;
-      animation: cardIn 0.3s ease both;
-      text-decoration: none;
-      color: inherit;
-    }
-
-    .card:hover { background: var(--surface2); }
-
-    .card-source-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.5rem;
-    }
-
-    .card-source {
-      font-size: 0.58rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      padding: 0.18rem 0.5rem;
-      border: 1px solid;
-    }
-
-    .card-source.news    { color: var(--blue);   border-color: rgba(69,153,255,0.3);  background: rgba(69,153,255,0.05); }
-    .card-source.reddit  { color: var(--accent2); border-color: rgba(245,166,35,0.3);  background: rgba(245,166,35,0.05); }
-    .card-source.hn      { color: #ff6600;        border-color: rgba(255,102,0,0.3);   background: rgba(255,102,0,0.05); }
-    .card-source.bing    { color: #00b4d8;        border-color: rgba(0,180,216,0.3);   background: rgba(0,180,216,0.05); }
-
-    .card-time {
-      font-size: 0.6rem;
-      color: var(--muted);
-      letter-spacing: 0.04em;
-      font-style: italic;
-    }
-
-    .card-title {
-      font-family: var(--sans);
-      font-size: 0.92rem;
-      font-weight: 600;
-      color: var(--text);
-      line-height: 1.45;
-      letter-spacing: -0.01em;
-    }
-
-    .card:hover .card-title { color: var(--accent); }
-
-    .card-body {
-      font-size: 0.74rem;
-      color: var(--muted);
-      line-height: 1.75;
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    .card-meta-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: auto;
-      padding-top: 0.6rem;
-      border-top: 1px solid var(--border);
-    }
-
-    .card-author {
-      font-size: 0.6rem;
-      color: var(--muted);
-      letter-spacing: 0.04em;
-    }
-
-    .card-arrow {
-      font-size: 0.7rem;
-      color: var(--muted);
-      transition: color 0.15s, transform 0.15s;
-    }
-    .card:hover .card-arrow { color: var(--accent); transform: translateX(3px); }
-
-    /* Featured card (first result per source) */
-    .card.featured {
-      grid-column: span 2;
-    }
-
-    .card.featured .card-title {
-      font-size: 1.15rem;
-    }
-
-    /* ── EMPTY / LOADING / ERROR STATES ── */
-    .feed-state {
-      grid-column: 1 / -1;
-      padding: 3rem 2rem;
-      text-align: center;
-      color: var(--muted);
-      font-size: 0.78rem;
-      letter-spacing: 0.06em;
-    }
-
-    .feed-state .spinner {
-      width: 24px; height: 24px;
-      border: 2px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      margin: 0 auto 1rem;
-    }
+    /* ── MAIN ── */
+    main { max-width: 1200px; margin: 0 auto; padding: 2rem 2rem 6rem; }
 
     /* ── SECTION HEADERS ── */
-    .section-header {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 1rem;
-      margin-top: 2rem;
-    }
-
+    .section-header { display: flex; align-items: center; gap: 1rem; margin: 2rem 0 1rem; }
     .section-header:first-of-type { margin-top: 0; }
+    .section-label { font-family: var(--sans); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+    .section-line { flex: 1; height: 1px; background: var(--border); }
+    .section-count { font-size: 0.62rem; color: var(--muted); letter-spacing: 0.08em; white-space: nowrap; }
 
-    .section-label {
-      font-family: var(--sans);
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      white-space: nowrap;
-    }
+    /* ── FEED GRID ── */
+    .feed-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); margin-bottom: 0.5rem; }
 
-    .section-line {
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
+    /* ── CARD ── */
+    .card { background: var(--surface); padding: 1.4rem; display: flex; flex-direction: column; gap: 0.7rem; transition: background 0.15s; text-decoration: none; color: inherit; animation: cardIn 0.3s ease both; }
+    .card:hover { background: var(--surface2); }
+    .card.featured { grid-column: span 2; }
+    .card-source-row { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+    .card-source { font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; padding: 0.18rem 0.5rem; border: 1px solid; }
+    .card-source.gnews  { color: var(--blue);    border-color: rgba(69,153,255,0.3);   background: rgba(69,153,255,0.05); }
+    .card-source.bing   { color: #00b4d8;        border-color: rgba(0,180,216,0.3);    background: rgba(0,180,216,0.05); }
+    .card-source.reddit { color: var(--accent2); border-color: rgba(245,166,35,0.3);   background: rgba(245,166,35,0.05); }
+    .card-source.hn     { color: #ff6600;        border-color: rgba(255,102,0,0.3);    background: rgba(255,102,0,0.05); }
+    .card-source.devto  { color: var(--purple);  border-color: rgba(168,85,247,0.3);   background: rgba(168,85,247,0.05); }
+    .card-source.github { color: var(--teal);    border-color: rgba(110,231,183,0.3);  background: rgba(110,231,183,0.05); }
+    .card-source.youtube{ color: #ff0000;        border-color: rgba(255,0,0,0.3);      background: rgba(255,0,0,0.05); }
+    .card-time { font-size: 0.6rem; color: var(--muted); letter-spacing: 0.04em; font-style: italic; }
+    .card-title { font-family: var(--sans); font-size: 0.92rem; font-weight: 600; color: var(--text); line-height: 1.45; letter-spacing: -0.01em; }
+    .card:hover .card-title { color: var(--accent); }
+    .card-body { font-size: 0.74rem; color: var(--muted); line-height: 1.75; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .card-meta-row { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 0.6rem; border-top: 1px solid var(--border); }
+    .card-author { font-size: 0.6rem; color: var(--muted); }
+    .card-arrow { font-size: 0.7rem; color: var(--muted); transition: color 0.15s, transform 0.15s; }
+    .card:hover .card-arrow { color: var(--accent); transform: translateX(3px); }
 
-    .section-count {
-      font-size: 0.62rem;
-      color: var(--muted);
-      letter-spacing: 0.08em;
-      white-space: nowrap;
-    }
+    /* ── STATES ── */
+    .feed-state { grid-column: 1 / -1; padding: 3rem 2rem; text-align: center; color: var(--muted); font-size: 0.78rem; letter-spacing: 0.06em; }
+    .spinner { width: 24px; height: 24px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 1rem; }
 
     /* ── CONTROLS ── */
-    .controls {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      flex-wrap: wrap;
-      padding: 1.2rem 0;
-      border-top: 1px solid var(--border);
-      margin-top: 1rem;
-    }
-
-    .refresh-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.6rem;
-      font-family: var(--mono);
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      background: var(--accent);
-      color: #0a0a0b;
-      border: none;
-      padding: 0.75rem 1.8rem;
-      cursor: pointer;
-      transition: opacity 0.2s, transform 0.15s;
-    }
-
+    .controls { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding: 1.2rem 0; border-top: 1px solid var(--border); margin-top: 1rem; }
+    .refresh-btn { display: inline-flex; align-items: center; gap: 0.6rem; font-family: var(--mono); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; background: var(--accent); color: #0a0a0b; border: none; padding: 0.75rem 1.8rem; cursor: pointer; transition: opacity 0.2s, transform 0.15s; }
     .refresh-btn:hover { opacity: 0.88; transform: translateY(-1px); }
-    .refresh-btn:active { transform: translateY(0); }
     .refresh-btn:disabled { opacity: 0.4; cursor: default; transform: none; }
+    .refresh-icon { font-size: 1rem; }
+    .refresh-btn.spinning .refresh-icon { animation: spin 0.7s linear infinite; display: inline-block; }
+    .total-count { font-family: var(--sans); font-size: 1.4rem; font-weight: 800; color: var(--accent); }
+    .controls-right { display: flex; align-items: center; gap: 1rem; font-size: 0.65rem; color: var(--muted); }
 
-    .refresh-icon { font-size: 1rem; transition: transform 0.4s; }
-    .refresh-btn.spinning .refresh-icon { animation: spin 0.7s linear infinite; }
-
-    .controls-right {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      font-size: 0.65rem;
-      color: var(--muted);
-      letter-spacing: 0.05em;
-    }
-
-    .total-count {
-      font-family: var(--sans);
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: var(--accent);
-    }
-
-    /* ── FOOTER ── */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 1.6rem 3rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 0.65rem;
-      color: var(--muted);
-      letter-spacing: 0.04em;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-
-    .footer-sources {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .footer-source { color: var(--muted); }
+    footer { border-top: 1px solid var(--border); padding: 1.6rem 3rem; display: flex; align-items: center; justify-content: space-between; font-size: 0.65rem; color: var(--muted); flex-wrap: wrap; gap: 0.5rem; }
+    .footer-sources { display: flex; gap: 1rem; flex-wrap: wrap; }
     .footer-source span { color: var(--accent); }
 
     /* ── ANIMATIONS ── */
-    @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0.2; } }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    @keyframes chipPulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
-    @keyframes cardIn {
-      from { opacity:0; transform:translateY(8px); }
-      to   { opacity:1; transform:translateY(0); }
-    }
+    @keyframes blink     { 0%,100%{opacity:1} 50%{opacity:0.2} }
+    @keyframes spin      { to{transform:rotate(360deg)} }
+    @keyframes chipPulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    @keyframes cardIn    { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
     @media (max-width: 700px) {
       .header, .sources-bar, footer { padding-left: 1.2rem; padding-right: 1.2rem; }
@@ -426,7 +130,7 @@
   <div class="header-left">
     <a class="back-link" href="../../index.html">← CubicleCreative</a>
     <div class="site-title">Dyson <span>Signal</span></div>
-    <div class="tagline">Live feed // News · Reddit · Hacker News · Community</div>
+    <div class="tagline">Live feed // News · Reddit · HN · Dev.to · GitHub · YouTube</div>
   </div>
   <div class="header-right">
     <div class="live-badge"><div class="live-dot"></div> Live</div>
@@ -439,13 +143,20 @@
   <div class="source-chip active" id="chip-gnews"   data-id="gnews">Google News</div>
   <div class="source-chip active" id="chip-bing"    data-id="bing">Bing News</div>
   <div class="source-chip active" id="chip-reddit"  data-id="reddit">Reddit</div>
-  <div class="source-chip active" id="chip-hn"      data-id="hn">Hacker News</div>
   <div class="source-chip active" id="chip-dysonr"  data-id="dysonr">r/dyson</div>
   <div class="source-chip active" id="chip-vacuum"  data-id="vacuum">r/VacuumCleaners</div>
+  <div class="source-chip active" id="chip-hn"      data-id="hn">Hacker News</div>
+  <div class="source-chip active" id="chip-devto"   data-id="devto">Dev.to</div>
+  <div class="source-chip active" id="chip-github"  data-id="github">GitHub</div>
+  <div class="source-chip active" id="chip-youtube" data-id="youtube">YouTube</div>
 </div>
 
 <main>
-  <div id="feed-root"></div>
+  <div id="feed-root">
+    <div class="feed-grid">
+      <div class="feed-state">Loading…</div>
+    </div>
+  </div>
 
   <div class="controls">
     <button class="refresh-btn" id="refresh-btn" onclick="fetchAll()">
@@ -466,7 +177,10 @@
     <span class="footer-source">Google News <span>RSS</span></span>
     <span class="footer-source">Bing News <span>RSS</span></span>
     <span class="footer-source">Reddit <span>JSON API</span></span>
-    <span class="footer-source">Hacker News <span>Algolia API</span></span>
+    <span class="footer-source">Hacker News <span>Algolia</span></span>
+    <span class="footer-source">Dev.to <span>API</span></span>
+    <span class="footer-source">GitHub <span>REST API</span></span>
+    <span class="footer-source">YouTube <span>RSS</span></span>
   </div>
 </footer>
 
@@ -474,59 +188,60 @@
 (function(){
 'use strict';
 
-// ─── CONFIG ───────────────────────────────────────────────────────────────────
-// Primary: corsproxy.io wraps the raw RSS feed (works on GitHub Pages)
-// Fallback: rss2json.com parses RSS to JSON for us
-
-const CORS       = 'https://corsproxy.io/?';
-const RSS2JSON   = 'https://api.rss2json.com/v1/api.json?count=8&rss_url=';
-
-const GNEWS_URL  = 'https://news.google.com/rss/search?q=dyson+vacuum&hl=en-US&gl=US&ceid=US:en';
-const BING_URL   = 'https://feeds.skimfeed.com/bing/news?q=dyson+vacuum'; // CORS-friendly Bing proxy
-
-// Reddit public JSON — no custom headers (browsers block them cross-origin)
-const REDDIT_SEARCH = 'https://www.reddit.com/search.json?q=dyson+vacuum&sort=new&limit=8&t=week';
-const REDDIT_DYSON  = 'https://www.reddit.com/r/dyson/new.json?limit=6';
-const REDDIT_VACUUM = 'https://www.reddit.com/r/VacuumCleaners/search.json?q=dyson&sort=new&limit=6&restrict_sr=true&t=month';
-
-// HN Algolia — always works (open CORS)
-const HN_URL = 'https://hn.algolia.com/api/v1/search?query=dyson+vacuum&tags=story&hitsPerPage=8';
-
 // ─── STATE ────────────────────────────────────────────────────────────────────
 
-const enabled = { gnews:true, bing:true, reddit:true, hn:true, dysonr:true, vacuum:true };
+// ← Paste your Cloudflare Worker URL here (e.g. 'https://dyson-signal.yourname.workers.dev')
+const workerUrl = 'https://dyson-signal.aniruddhsuresh.workers.dev/';
+
 let allResults = [];
 
-// ─── CHIP CONTROLS ───────────────────────────────────────────────────────────
+const enabled = {
+  gnews:true, bing:true, reddit:true, dysonr:true,
+  vacuum:true, hn:true, devto:true, github:true, youtube:true
+};
+
+const SOURCE_GROUPS = {
+  gnews:  'Google News',
+  bing:   'Bing News',
+  reddit: 'Reddit',
+  dysonr: 'r/dyson',
+  vacuum: 'r/VacuumCleaners',
+  hn:     'Hacker News',
+  devto:  'Dev.to',
+  github: 'GitHub',
+  youtube:'YouTube',
+};
+
+const LABEL_TO_KEY = {
+  'Google News':       'gnews',
+  'Bing News':         'bing',
+  'Reddit':            'reddit',
+  'r/dyson':           'dysonr',
+  'r/VacuumCleaners':  'vacuum',
+  'Hacker News':       'hn',
+  'Dev.to':            'devto',
+  'GitHub':            'github',
+  'YouTube':           'youtube',
+};
+
+// ─── CHIP CONTROLS ────────────────────────────────────────────────────────────
 
 document.querySelectorAll('.source-chip').forEach(function(chip){
   chip.addEventListener('click', function(){
     const id = this.dataset.id;
     enabled[id] = !enabled[id];
-    // Keep ok/error visual but toggle dim if disabled
-    if(!enabled[id]){
-      this.className = 'source-chip';
-    } else {
-      const prev = chipSucceeded[id];
-      this.className = 'source-chip ' + (prev === true ? 'ok' : prev === false ? 'error' : 'active');
-    }
+    this.classList.toggle('active', enabled[id]);
     renderAll();
   });
 });
 
-// Track per-source success/failure so toggling off+on restores correct state
-const chipSucceeded = {};
-
 function setChipState(id, state){
   const chip = document.getElementById('chip-'+id);
   if(!chip) return;
-  chipSucceeded[id] = (state === 'ok');
-  // Preserve disabled look if source was toggled off
-  if(!enabled[id]){ chip.className = 'source-chip'; return; }
   chip.className = 'source-chip ' + state;
 }
 
-// ─── FETCH ALL ───────────────────────────────────────────────────────────────
+// ─── FETCH ────────────────────────────────────────────────────────────────────
 
 window.fetchAll = async function(){
   const btn = document.getElementById('refresh-btn');
@@ -535,188 +250,48 @@ window.fetchAll = async function(){
   allResults = [];
   renderLoading();
 
-  // All chips → loading
-  Object.keys(enabled).forEach(k => {
-    const chip = document.getElementById('chip-'+k);
-    if(chip) chip.className = 'source-chip loading';
-  });
+  Object.keys(enabled).forEach(k => setChipState(k, 'loading'));
 
-  await Promise.allSettled([
-    fetchGNews(),
-    fetchBing(),
-    fetchRedditSearch(),
-    fetchRedditDyson(),
-    fetchRedditVacuum(),
-    fetchHN()
-  ]);
+  try {
+    const res  = await fetch(workerUrl + '/feed?source=all', {signal: AbortSignal.timeout(20000)});
+    if(!res.ok) throw new Error('Worker returned HTTP ' + res.status);
+    const data = await res.json();
+    if(!data.ok) throw new Error(data.error || 'Worker error');
 
-  const now = new Date();
-  document.getElementById('last-updated').textContent =
-    'Updated ' + now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    allResults = data.results || [];
+
+    // Mark chips based on which sources returned data
+    const foundSources = new Set(allResults.map(r => r._source || labelToKey(r.sourceLabel)));
+    Object.keys(enabled).forEach(k => {
+      setChipState(k, foundSources.has(k) ? 'ok' : 'error');
+    });
+
+    document.getElementById('last-updated').textContent =
+      'Updated ' + new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+
+    renderAll();
+  } catch(err){
+    Object.keys(enabled).forEach(k => setChipState(k, 'error'));
+    renderFetchError(err.message);
+    document.getElementById('total-count').textContent = '0';
+  }
 
   btn.classList.remove('spinning');
   btn.disabled = false;
-
-  if(allResults.length === 0){
-    renderError();
-    document.getElementById('total-count').textContent = '0';
-  } else {
-    renderAll();
-  }
 };
 
-// ─── RSS FETCH (corsproxy → parse XML → fallback rss2json) ────────────────────
-
-async function fetchRSS(rawUrl, source, label, chipId){
-  // Strategy 1: corsproxy + native XML parse (most reliable, no rate limits)
-  try {
-    const res  = await fetch(CORS + encodeURIComponent(rawUrl), {signal: AbortSignal.timeout(8000)});
-    if(!res.ok) throw new Error('http '+res.status);
-    const text = await res.text();
-    const items = parseRSS(text, source, label);
-    if(!items.length) throw new Error('empty xml');
-    allResults = allResults.concat(items);
-    setChipState(chipId, 'ok');
-    return;
-  } catch(e1){/* fall through */}
-
-  // Strategy 2: rss2json.com as fallback
-  try {
-    const res  = await fetch(RSS2JSON + encodeURIComponent(rawUrl), {signal: AbortSignal.timeout(8000)});
-    const data = await res.json();
-    if(!data.items || !data.items.length) throw new Error('empty');
-    const items = data.items.slice(0,8).map(function(item, i){
-      return {
-        source, sourceLabel: label,
-        title:  cleanTitle(item.title || ''),
-        url:    item.link || '#',
-        body:   stripHtml(item.description || item.content || ''),
-        author: item.author || label,
-        time:   item.pubDate ? new Date(item.pubDate) : null,
-        featured: i === 0
-      };
-    });
-    allResults = allResults.concat(items);
-    setChipState(chipId, 'ok');
-  } catch(e2){
-    setChipState(chipId, 'error');
-  }
+function labelToKey(label){
+  return LABEL_TO_KEY[label] || label;
 }
 
-function fetchGNews(){ return fetchRSS(GNEWS_URL, 'news', 'Google News', 'gnews'); }
-function fetchBing(){  return fetchRSS(BING_URL,  'bing', 'Bing News',   'bing'); }
-
-// ─── REDDIT (simple fetch, no custom headers — browsers CORS-block them) ──────
-
-async function fetchRedditJSON(url, labelOverride, chipId, mapFn){
-  try {
-    // Reddit's .json endpoints allow cross-origin reads without auth
-    const res  = await fetch(url + (url.includes('?') ? '&' : '?') + 'raw_json=1',
-                             {signal: AbortSignal.timeout(8000)});
-    if(!res.ok) throw new Error('http '+res.status);
-    const data = await res.json();
-    const posts = (data && data.data && data.data.children) || [];
-    if(!posts.length) throw new Error('empty');
-    const items = posts.map(mapFn).filter(Boolean);
-    allResults = allResults.concat(items);
-    setChipState(chipId, 'ok');
-  } catch(e){
-    setChipState(chipId, 'error');
-  }
-}
-
-function fetchRedditSearch(){
-  return fetchRedditJSON(REDDIT_SEARCH, 'Reddit', 'reddit', function(p, i){
-    const d = p.data;
-    if(!d || !d.title) return null;
-    return {
-      source: 'reddit', sourceLabel: 'Reddit',
-      title:  d.title,
-      url:    'https://www.reddit.com' + d.permalink,
-      body:   d.selftext ? d.selftext.slice(0,200) : 'r/'+d.subreddit+' · '+Math.round(d.score||0)+' upvotes',
-      author: 'u/'+d.author+' · r/'+d.subreddit,
-      time:   d.created_utc ? new Date(d.created_utc*1000) : null,
-      featured: false
-    };
-  });
-}
-
-function fetchRedditDyson(){
-  return fetchRedditJSON(REDDIT_DYSON, 'r/dyson', 'dysonr', function(p){
-    const d = p.data;
-    if(!d || !d.title) return null;
-    return {
-      source: 'reddit', sourceLabel: 'r/dyson',
-      title:  d.title,
-      url:    'https://www.reddit.com' + d.permalink,
-      body:   d.selftext ? d.selftext.slice(0,200) : Math.round(d.score||0)+' upvotes · '+Math.round(d.num_comments||0)+' comments',
-      author: 'u/'+d.author,
-      time:   d.created_utc ? new Date(d.created_utc*1000) : null,
-      featured: false
-    };
-  });
-}
-
-function fetchRedditVacuum(){
-  return fetchRedditJSON(REDDIT_VACUUM, 'r/VacuumCleaners', 'vacuum', function(p){
-    const d = p.data;
-    if(!d || !d.title) return null;
-    return {
-      source: 'reddit', sourceLabel: 'r/VacuumCleaners',
-      title:  d.title,
-      url:    'https://www.reddit.com' + d.permalink,
-      body:   d.selftext ? d.selftext.slice(0,200) : Math.round(d.score||0)+' upvotes · '+Math.round(d.num_comments||0)+' comments',
-      author: 'u/'+d.author,
-      time:   d.created_utc ? new Date(d.created_utc*1000) : null,
-      featured: false
-    };
-  });
-}
-
-// ─── HACKER NEWS ─────────────────────────────────────────────────────────────
-
-async function fetchHN(){
-  try {
-    const res  = await fetch(HN_URL, {signal: AbortSignal.timeout(8000)});
-    if(!res.ok) throw new Error('http '+res.status);
-    const data = await res.json();
-    const hits = (data.hits||[]).filter(h => h.title);
-    if(!hits.length) throw new Error('empty');
-    const items = hits.slice(0,8).map(function(h, i){
-      return {
-        source: 'hn', sourceLabel: 'Hacker News',
-        title:  h.title,
-        url:    h.url || 'https://news.ycombinator.com/item?id='+h.objectID,
-        body:   (h.points||0)+' points · '+(h.num_comments||0)+' comments',
-        author: h.author || 'HN',
-        time:   h.created_at ? new Date(h.created_at) : null,
-        featured: i === 0
-      };
-    });
-    allResults = allResults.concat(items);
-    setChipState('hn', 'ok');
-  } catch(e){
-    setChipState('hn','error');
-  }
-}
-
-// ─── RENDER ──────────────────────────────────────────────────────────────────
-
-function getEnabledKey(item){
-  if(item.source === 'hn')     return 'hn';
-  if(item.source === 'news')   return 'gnews';
-  if(item.source === 'bing')   return 'bing';
-  if(item.sourceLabel === 'r/dyson')          return 'dysonr';
-  if(item.sourceLabel === 'r/VacuumCleaners') return 'vacuum';
-  if(item.source === 'reddit') return 'reddit';
-  return null;
-}
+// ─── RENDER ───────────────────────────────────────────────────────────────────
 
 function renderAll(){
   const root = document.getElementById('feed-root');
+
   const visible = allResults.filter(function(item){
-    const k = getEnabledKey(item);
-    return k ? enabled[k] : true;
+    const k = item._source || labelToKey(item.sourceLabel);
+    return enabled[k] !== false;
   });
 
   if(!visible.length){
@@ -727,29 +302,30 @@ function renderAll(){
 
   visible.sort(function(a,b){
     if(!a.time && !b.time) return 0;
-    if(!a.time) return 1;
-    if(!b.time) return -1;
-    return b.time - a.time;
+    if(!a.time) return 1; if(!b.time) return -1;
+    return new Date(b.time) - new Date(a.time);
   });
 
+  // Group by sourceLabel
   const groups = {};
   visible.forEach(function(item){
-    const g = item.sourceLabel || item.source;
+    const g = item.sourceLabel;
     if(!groups[g]) groups[g] = [];
     groups[g].push(item);
   });
 
+  const ORDER = ['Google News','Bing News','Reddit','r/dyson','r/VacuumCleaners','Hacker News','Dev.to','GitHub','YouTube'];
+
   let html = '';
-  const ORDER = ['Google News','Bing News','Reddit','r/dyson','r/VacuumCleaners','Hacker News'];
   ORDER.forEach(function(gname){
     if(!groups[gname]) return;
     const items = groups[gname];
     html += '<div class="section-header">'
-          +   '<div class="section-label">'+gname+'</div>'
-          +   '<div class="section-line"></div>'
-          +   '<div class="section-count">'+items.length+' result'+(items.length!==1?'s':'')+'</div>'
-          + '</div>';
-    html += '<div class="feed-grid">';
+          + '<div class="section-label">'+gname+'</div>'
+          + '<div class="section-line"></div>'
+          + '<div class="section-count">'+items.length+' result'+(items.length!==1?'s':'')+'</div>'
+          + '</div>'
+          + '<div class="feed-grid">';
     items.forEach(function(item, i){
       html += renderCard(item, i===0 && items.length > 2);
     });
@@ -762,8 +338,10 @@ function renderAll(){
 
 function renderCard(item, featured){
   const cls    = 'card' + (featured ? ' featured' : '');
-  const time   = item.time ? relTime(item.time) : '';
-  const srcCls = {news:'news', bing:'bing', reddit:'reddit', hn:'hn'}[item.source] || 'news';
+  const time   = item.time ? relTime(new Date(item.time)) : '';
+  const srcKey = item._source || labelToKey(item.sourceLabel);
+  const srcCls = {gnews:'gnews',bing:'bing',reddit:'reddit',dysonr:'reddit',vacuum:'reddit',
+                  hn:'hn',devto:'devto',github:'github',youtube:'youtube'}[srcKey] || 'gnews';
   return '<a class="'+cls+'" href="'+esc(item.url)+'" target="_blank" rel="noopener">'
     + '<div class="card-source-row">'
     +   '<span class="card-source '+srcCls+'">'+esc(item.sourceLabel)+'</span>'
@@ -780,74 +358,35 @@ function renderCard(item, featured){
 
 function renderLoading(){
   document.getElementById('feed-root').innerHTML =
-    '<div class="feed-grid"><div class="feed-state"><div class="spinner"></div>Fetching from all sources…</div></div>';
+    '<div class="feed-grid"><div class="feed-state"><div class="spinner"></div>Fetching from all sources via Worker…</div></div>';
   document.getElementById('total-count').textContent = '—';
 }
 
-function renderError(){
-  const failed = Object.keys(chipSucceeded).filter(k => chipSucceeded[k]===false).length;
-  const succeeded = Object.keys(chipSucceeded).filter(k => chipSucceeded[k]===true).length;
+function renderFetchError(msg){
   document.getElementById('feed-root').innerHTML =
     '<div class="feed-grid"><div class="feed-state" style="text-align:left;padding:2rem 2.5rem;">'
-    + '<div style="font-family:var(--sans);font-size:1.1rem;font-weight:700;color:var(--red);margin-bottom:1rem;">⚠ No results loaded</div>'
-    + '<div style="font-size:0.76rem;color:var(--muted);line-height:2;max-width:520px;">'
-    + 'All sources returned empty or were blocked. This usually means:<br>'
-    + '&nbsp;· The preview sandbox is blocking outbound requests (expected here)<br>'
-    + '&nbsp;· A CORS proxy is temporarily down — try refreshing<br><br>'
-    + '<strong style="color:var(--text)">On GitHub Pages this will work correctly.</strong> Upload to your repo and open it there.'
+    + '<div style="font-family:var(--sans);font-size:1rem;font-weight:700;color:var(--red);margin-bottom:0.8rem;">⚠ Could not reach Worker</div>'
+    + '<div style="font-size:0.76rem;color:var(--muted);line-height:2;">'
+    + esc(msg) + '<br><br>'
+    + 'Make sure your Worker is deployed and the URL is correct.<br>'
+    + 'The URL should look like: <code style="color:var(--accent)">https://dyson-signal.YOUR-NAME.workers.dev</code>'
     + '</div></div></div>';
 }
 
-// ─── UTILITIES ───────────────────────────────────────────────────────────────
+// ─── UTILITIES ────────────────────────────────────────────────────────────────
 
 function relTime(d){
-  const s = (Date.now()-d.getTime())/1000;
-  if(s<60)     return 'just now';
-  if(s<3600)   return Math.floor(s/60)+'m ago';
-  if(s<86400)  return Math.floor(s/3600)+'h ago';
-  if(s<604800) return Math.floor(s/86400)+'d ago';
-  return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
-}
-
-function stripHtml(s){
-  return String(s||'').replace(/<[^>]*>/g,'')
-    .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>')
-    .replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/\s+/g,' ').trim();
-}
-
-function cleanTitle(s){
-  return stripHtml(s).replace(/\s*-\s*[^-]{2,}$/, '').trim() || stripHtml(s);
+  const s = (Date.now() - d.getTime()) / 1000;
+  if(s < 60)     return 'just now';
+  if(s < 3600)   return Math.floor(s/60)+'m ago';
+  if(s < 86400)  return Math.floor(s/3600)+'h ago';
+  if(s < 604800) return Math.floor(s/86400)+'d ago';
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
 }
 
 function esc(s){
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-
-function parseRSS(xml, source, label){
-  try {
-    const doc   = new DOMParser().parseFromString(xml, 'application/xml');
-    const nodes = Array.from(doc.querySelectorAll('item')).slice(0,8);
-    return nodes.map(function(el, i){
-      const link = el.querySelector('link');
-      // <link> in RSS is a text node sibling, not an attribute
-      const url  = (link && (link.textContent || link.nextSibling && link.nextSibling.textContent)) || '#';
-      return {
-        source, sourceLabel: label,
-        title:  cleanTitle(el.querySelector('title')?.textContent || ''),
-        url:    url.trim(),
-        body:   stripHtml(el.querySelector('description')?.textContent || ''),
-        author: el.querySelector('author, dc\\:creator')?.textContent?.trim() || label,
-        time:   el.querySelector('pubDate')
-                  ? new Date(el.querySelector('pubDate').textContent) : null,
-        featured: i===0
-      };
-    }).filter(function(item){ return item.title && item.url !== '#'; });
-  } catch(e){ return []; }
-}
-
-// ─── INIT ────────────────────────────────────────────────────────────────────
-
-fetchAll();
 
 })();
 </script>
