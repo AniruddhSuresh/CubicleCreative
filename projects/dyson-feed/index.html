@@ -161,7 +161,7 @@
     .source-chip.active { border-color: var(--accent); color: var(--accent); background: rgba(200,245,66,0.06); }
     .source-chip.loading { border-color: var(--accent2); color: var(--accent2); animation: chipPulse 1s ease-in-out infinite; }
     .source-chip.error { border-color: var(--red); color: var(--red); }
-    .source-chip.ok { border-color: #3a5a2a; color: var(--accent); }
+    .source-chip.ok { border-color: var(--accent); color: var(--accent); background: rgba(200,245,66,0.06); }
 
     /* ── MAIN GRID ── */
     main {
@@ -474,40 +474,59 @@
 (function(){
 'use strict';
 
-// ─── CONFIG ────────────────────────────────────────────────────────────────────
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+// Primary: corsproxy.io wraps the raw RSS feed (works on GitHub Pages)
+// Fallback: rss2json.com parses RSS to JSON for us
 
-const RSS2JSON   = 'https://api.rss2json.com/v1/api.json?rss_url=';
+const CORS       = 'https://corsproxy.io/?';
+const RSS2JSON   = 'https://api.rss2json.com/v1/api.json?count=8&rss_url=';
+
 const GNEWS_URL  = 'https://news.google.com/rss/search?q=dyson+vacuum&hl=en-US&gl=US&ceid=US:en';
-const BING_URL   = 'https://www.bing.com/news/search?q=dyson+vacuum&format=rss';
+const BING_URL   = 'https://feeds.skimfeed.com/bing/news?q=dyson+vacuum'; // CORS-friendly Bing proxy
 
-const REDDIT_SEARCH  = 'https://www.reddit.com/search.json?q=dyson+vacuum&sort=new&limit=8&restrict_sr=false&t=week';
-const REDDIT_DYSON   = 'https://www.reddit.com/r/dyson/new.json?limit=6';
-const REDDIT_VACUUM  = 'https://www.reddit.com/r/VacuumCleaners/search.json?q=dyson&sort=new&limit=6&restrict_sr=true&t=month';
-const HN_URL         = 'https://hn.algolia.com/api/v1/search?query=dyson+vacuum&tags=story&hitsPerPage=8';
+// Reddit public JSON — no custom headers (browsers block them cross-origin)
+const REDDIT_SEARCH = 'https://www.reddit.com/search.json?q=dyson+vacuum&sort=new&limit=8&t=week';
+const REDDIT_DYSON  = 'https://www.reddit.com/r/dyson/new.json?limit=6';
+const REDDIT_VACUUM = 'https://www.reddit.com/r/VacuumCleaners/search.json?q=dyson&sort=new&limit=6&restrict_sr=true&t=month';
 
-// ─── STATE ─────────────────────────────────────────────────────────────────────
+// HN Algolia — always works (open CORS)
+const HN_URL = 'https://hn.algolia.com/api/v1/search?query=dyson+vacuum&tags=story&hitsPerPage=8';
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
 
 const enabled = { gnews:true, bing:true, reddit:true, hn:true, dysonr:true, vacuum:true };
 let allResults = [];
 
-// ─── SOURCE CHIPS ─────────────────────────────────────────────────────────────
+// ─── CHIP CONTROLS ───────────────────────────────────────────────────────────
 
 document.querySelectorAll('.source-chip').forEach(function(chip){
   chip.addEventListener('click', function(){
     const id = this.dataset.id;
     enabled[id] = !enabled[id];
-    this.classList.toggle('active', enabled[id]);
+    // Keep ok/error visual but toggle dim if disabled
+    if(!enabled[id]){
+      this.className = 'source-chip';
+    } else {
+      const prev = chipSucceeded[id];
+      this.className = 'source-chip ' + (prev === true ? 'ok' : prev === false ? 'error' : 'active');
+    }
     renderAll();
   });
 });
 
+// Track per-source success/failure so toggling off+on restores correct state
+const chipSucceeded = {};
+
 function setChipState(id, state){
   const chip = document.getElementById('chip-'+id);
   if(!chip) return;
+  chipSucceeded[id] = (state === 'ok');
+  // Preserve disabled look if source was toggled off
+  if(!enabled[id]){ chip.className = 'source-chip'; return; }
   chip.className = 'source-chip ' + state;
 }
 
-// ─── FETCH ALL ─────────────────────────────────────────────────────────────────
+// ─── FETCH ALL ───────────────────────────────────────────────────────────────
 
 window.fetchAll = async function(){
   const btn = document.getElementById('refresh-btn');
@@ -516,7 +535,11 @@ window.fetchAll = async function(){
   allResults = [];
   renderLoading();
 
-  Object.keys(enabled).forEach(k => setChipState(k, 'loading'));
+  // All chips → loading
+  Object.keys(enabled).forEach(k => {
+    const chip = document.getElementById('chip-'+k);
+    if(chip) chip.className = 'source-chip loading';
+  });
 
   await Promise.allSettled([
     fetchGNews(),
@@ -535,190 +558,173 @@ window.fetchAll = async function(){
   btn.disabled = false;
 
   if(allResults.length === 0){
-    // Count how many chips are in error state
-    const errored = Object.keys(enabled).filter(k => {
-      const chip = document.getElementById('chip-'+k);
-      return chip && chip.className.includes('error');
-    }).length;
-    renderError(errored, Object.keys(enabled).length);
+    renderError();
     document.getElementById('total-count').textContent = '0';
   } else {
     renderAll();
   }
 };
 
-// ─── FETCH HELPERS ─────────────────────────────────────────────────────────────
+// ─── RSS FETCH (corsproxy → parse XML → fallback rss2json) ────────────────────
 
-async function fetchRSS(url, source, label, chipId){
+async function fetchRSS(rawUrl, source, label, chipId){
+  // Strategy 1: corsproxy + native XML parse (most reliable, no rate limits)
   try {
-    const endpoint = RSS2JSON + encodeURIComponent(url) + '&count=8';
-    const res  = await fetch(endpoint);
+    const res  = await fetch(CORS + encodeURIComponent(rawUrl), {signal: AbortSignal.timeout(8000)});
+    if(!res.ok) throw new Error('http '+res.status);
+    const text = await res.text();
+    const items = parseRSS(text, source, label);
+    if(!items.length) throw new Error('empty xml');
+    allResults = allResults.concat(items);
+    setChipState(chipId, 'ok');
+    return;
+  } catch(e1){/* fall through */}
+
+  // Strategy 2: rss2json.com as fallback
+  try {
+    const res  = await fetch(RSS2JSON + encodeURIComponent(rawUrl), {signal: AbortSignal.timeout(8000)});
     const data = await res.json();
     if(!data.items || !data.items.length) throw new Error('empty');
-    const items = data.items.slice(0, 8).map(function(item, i){
+    const items = data.items.slice(0,8).map(function(item, i){
       return {
-        source: source,
-        sourceLabel: label,
-        title: cleanTitle(item.title || ''),
-        url: item.link || item.url || '#',
-        body: stripHtml(item.description || item.content || ''),
-        author: item.author || (data.feed && data.feed.title) || label,
-        time: item.pubDate ? new Date(item.pubDate) : null,
+        source, sourceLabel: label,
+        title:  cleanTitle(item.title || ''),
+        url:    item.link || '#',
+        body:   stripHtml(item.description || item.content || ''),
+        author: item.author || label,
+        time:   item.pubDate ? new Date(item.pubDate) : null,
         featured: i === 0
       };
     });
     allResults = allResults.concat(items);
     setChipState(chipId, 'ok');
-  } catch(e) {
+  } catch(e2){
     setChipState(chipId, 'error');
-    // Fallback: try alternate RSS proxy
-    try {
-      const alt = 'https://corsproxy.io/?' + encodeURIComponent(url);
-      const res = await fetch(alt);
-      const text = await res.text();
-      const parsed = parseRSS(text, source, label);
-      if(parsed.length){
-        allResults = allResults.concat(parsed.slice(0,8));
-        setChipState(chipId, 'ok');
-      }
-    } catch(_){}
   }
 }
 
 function fetchGNews(){ return fetchRSS(GNEWS_URL, 'news', 'Google News', 'gnews'); }
 function fetchBing(){  return fetchRSS(BING_URL,  'bing', 'Bing News',   'bing'); }
 
-async function fetchRedditSearch(){
+// ─── REDDIT (simple fetch, no custom headers — browsers CORS-block them) ──────
+
+async function fetchRedditJSON(url, labelOverride, chipId, mapFn){
   try {
-    const res  = await fetch(REDDIT_SEARCH, {headers:{'User-Agent':'DysonSignal/1.0'}});
+    // Reddit's .json endpoints allow cross-origin reads without auth
+    const res  = await fetch(url + (url.includes('?') ? '&' : '?') + 'raw_json=1',
+                             {signal: AbortSignal.timeout(8000)});
+    if(!res.ok) throw new Error('http '+res.status);
     const data = await res.json();
-    const posts = (data.data && data.data.children) || [];
-    const items = posts.slice(0, 8).map(function(p, i){
-      const d = p.data;
-      return {
-        source: 'reddit',
-        sourceLabel: 'Reddit',
-        title: d.title || '',
-        url: 'https://reddit.com' + (d.permalink || ''),
-        body: d.selftext ? d.selftext.slice(0,200) : ('r/'+d.subreddit+' · '+Math.round((d.score||0))+' upvotes'),
-        author: 'u/' + (d.author || 'unknown') + ' · r/' + (d.subreddit||'reddit'),
-        time: d.created_utc ? new Date(d.created_utc * 1000) : null,
-        featured: i === 0,
-        thumb: d.thumbnail && d.thumbnail.startsWith('http') ? d.thumbnail : null
-      };
-    });
+    const posts = (data && data.data && data.data.children) || [];
+    if(!posts.length) throw new Error('empty');
+    const items = posts.map(mapFn).filter(Boolean);
     allResults = allResults.concat(items);
-    setChipState('reddit', 'ok');
-  } catch(e){ setChipState('reddit','error'); }
+    setChipState(chipId, 'ok');
+  } catch(e){
+    setChipState(chipId, 'error');
+  }
 }
 
-async function fetchRedditDyson(){
-  try {
-    const res  = await fetch(REDDIT_DYSON, {headers:{'User-Agent':'DysonSignal/1.0'}});
-    const data = await res.json();
-    const posts = (data.data && data.data.children) || [];
-    const items = posts.slice(0, 6).map(function(p, i){
-      const d = p.data;
-      return {
-        source: 'reddit',
-        sourceLabel: 'r/dyson',
-        title: d.title || '',
-        url: 'https://reddit.com' + (d.permalink || ''),
-        body: d.selftext ? d.selftext.slice(0,200) : (Math.round(d.score||0)+' upvotes · '+Math.round(d.num_comments||0)+' comments'),
-        author: 'u/' + (d.author || 'unknown'),
-        time: d.created_utc ? new Date(d.created_utc * 1000) : null,
-        featured: false
-      };
-    });
-    allResults = allResults.concat(items);
-    setChipState('dysonr', 'ok');
-  } catch(e){ setChipState('dysonr','error'); }
+function fetchRedditSearch(){
+  return fetchRedditJSON(REDDIT_SEARCH, 'Reddit', 'reddit', function(p, i){
+    const d = p.data;
+    if(!d || !d.title) return null;
+    return {
+      source: 'reddit', sourceLabel: 'Reddit',
+      title:  d.title,
+      url:    'https://www.reddit.com' + d.permalink,
+      body:   d.selftext ? d.selftext.slice(0,200) : 'r/'+d.subreddit+' · '+Math.round(d.score||0)+' upvotes',
+      author: 'u/'+d.author+' · r/'+d.subreddit,
+      time:   d.created_utc ? new Date(d.created_utc*1000) : null,
+      featured: false
+    };
+  });
 }
 
-async function fetchRedditVacuum(){
-  try {
-    const res  = await fetch(REDDIT_VACUUM, {headers:{'User-Agent':'DysonSignal/1.0'}});
-    const data = await res.json();
-    const posts = (data.data && data.data.children) || [];
-    const items = posts.slice(0, 6).map(function(p, i){
-      const d = p.data;
-      return {
-        source: 'reddit',
-        sourceLabel: 'r/VacuumCleaners',
-        title: d.title || '',
-        url: 'https://reddit.com' + (d.permalink || ''),
-        body: d.selftext ? d.selftext.slice(0,200) : (Math.round(d.score||0)+' upvotes · '+Math.round(d.num_comments||0)+' comments'),
-        author: 'u/' + (d.author || 'unknown'),
-        time: d.created_utc ? new Date(d.created_utc * 1000) : null,
-        featured: false
-      };
-    });
-    allResults = allResults.concat(items);
-    setChipState('vacuum', 'ok');
-  } catch(e){ setChipState('vacuum','error'); }
+function fetchRedditDyson(){
+  return fetchRedditJSON(REDDIT_DYSON, 'r/dyson', 'dysonr', function(p){
+    const d = p.data;
+    if(!d || !d.title) return null;
+    return {
+      source: 'reddit', sourceLabel: 'r/dyson',
+      title:  d.title,
+      url:    'https://www.reddit.com' + d.permalink,
+      body:   d.selftext ? d.selftext.slice(0,200) : Math.round(d.score||0)+' upvotes · '+Math.round(d.num_comments||0)+' comments',
+      author: 'u/'+d.author,
+      time:   d.created_utc ? new Date(d.created_utc*1000) : null,
+      featured: false
+    };
+  });
 }
+
+function fetchRedditVacuum(){
+  return fetchRedditJSON(REDDIT_VACUUM, 'r/VacuumCleaners', 'vacuum', function(p){
+    const d = p.data;
+    if(!d || !d.title) return null;
+    return {
+      source: 'reddit', sourceLabel: 'r/VacuumCleaners',
+      title:  d.title,
+      url:    'https://www.reddit.com' + d.permalink,
+      body:   d.selftext ? d.selftext.slice(0,200) : Math.round(d.score||0)+' upvotes · '+Math.round(d.num_comments||0)+' comments',
+      author: 'u/'+d.author,
+      time:   d.created_utc ? new Date(d.created_utc*1000) : null,
+      featured: false
+    };
+  });
+}
+
+// ─── HACKER NEWS ─────────────────────────────────────────────────────────────
 
 async function fetchHN(){
   try {
-    const res  = await fetch(HN_URL);
+    const res  = await fetch(HN_URL, {signal: AbortSignal.timeout(8000)});
+    if(!res.ok) throw new Error('http '+res.status);
     const data = await res.json();
-    const hits = (data.hits || []).filter(function(h){ return h.title; });
+    const hits = (data.hits||[]).filter(h => h.title);
+    if(!hits.length) throw new Error('empty');
     const items = hits.slice(0,8).map(function(h, i){
       return {
-        source: 'hn',
-        sourceLabel: 'Hacker News',
-        title: h.title,
-        url: h.url || ('https://news.ycombinator.com/item?id=' + h.objectID),
-        body: (h.points||0)+' points · '+(h.num_comments||0)+' comments',
+        source: 'hn', sourceLabel: 'Hacker News',
+        title:  h.title,
+        url:    h.url || 'https://news.ycombinator.com/item?id='+h.objectID,
+        body:   (h.points||0)+' points · '+(h.num_comments||0)+' comments',
         author: h.author || 'HN',
-        time: h.created_at ? new Date(h.created_at) : null,
+        time:   h.created_at ? new Date(h.created_at) : null,
         featured: i === 0
       };
     });
     allResults = allResults.concat(items);
     setChipState('hn', 'ok');
-  } catch(e){ setChipState('hn','error'); }
+  } catch(e){
+    setChipState('hn','error');
+  }
 }
 
-// ─── RENDER ────────────────────────────────────────────────────────────────────
+// ─── RENDER ──────────────────────────────────────────────────────────────────
 
-const SOURCE_MAP = {
-  gnews: 'gnews',
-  bing:  'bing',
-  reddit:'reddit',
-  hn:    'hn',
-  dysonr:'dysonr',
-  vacuum:'vacuum'
-};
-
-// Map sourceLabel back to enabled key
 function getEnabledKey(item){
-  if(item.source === 'hn')    return 'hn';
-  if(item.source === 'news')  return 'gnews';
-  if(item.source === 'bing')  return 'bing';
-  if(item.sourceLabel === 'r/dyson')         return 'dysonr';
-  if(item.sourceLabel === 'r/VacuumCleaners')return 'vacuum';
+  if(item.source === 'hn')     return 'hn';
+  if(item.source === 'news')   return 'gnews';
+  if(item.source === 'bing')   return 'bing';
+  if(item.sourceLabel === 'r/dyson')          return 'dysonr';
+  if(item.sourceLabel === 'r/VacuumCleaners') return 'vacuum';
   if(item.source === 'reddit') return 'reddit';
   return null;
 }
 
 function renderAll(){
   const root = document.getElementById('feed-root');
-
-  // Filter by enabled sources
   const visible = allResults.filter(function(item){
-    const key = getEnabledKey(item);
-    return key ? enabled[key] : true;
+    const k = getEnabledKey(item);
+    return k ? enabled[k] : true;
   });
 
   if(!visible.length){
-    root.innerHTML = '<div class="section-header"><div class="section-line"></div></div>' +
-      '<div class="feed-grid"><div class="feed-state">No results. Try refreshing or enabling more sources.</div></div>';
+    root.innerHTML = '<div class="feed-grid"><div class="feed-state">No results — try refreshing or enabling more sources.</div></div>';
     document.getElementById('total-count').textContent = '0';
     return;
   }
 
-  // Sort newest first
   visible.sort(function(a,b){
     if(!a.time && !b.time) return 0;
     if(!a.time) return 1;
@@ -726,7 +732,6 @@ function renderAll(){
     return b.time - a.time;
   });
 
-  // Group by source label
   const groups = {};
   visible.forEach(function(item){
     const g = item.sourceLabel || item.source;
@@ -735,15 +740,18 @@ function renderAll(){
   });
 
   let html = '';
-  const groupOrder = ['Google News','Bing News','Reddit','r/dyson','r/VacuumCleaners','Hacker News'];
-
-  groupOrder.forEach(function(gname){
+  const ORDER = ['Google News','Bing News','Reddit','r/dyson','r/VacuumCleaners','Hacker News'];
+  ORDER.forEach(function(gname){
     if(!groups[gname]) return;
     const items = groups[gname];
-    html += '<div class="section-header"><div class="section-label">'+gname+'</div><div class="section-line"></div><div class="section-count">'+items.length+' result'+(items.length!==1?'s':'')+'</div></div>';
+    html += '<div class="section-header">'
+          +   '<div class="section-label">'+gname+'</div>'
+          +   '<div class="section-line"></div>'
+          +   '<div class="section-count">'+items.length+' result'+(items.length!==1?'s':'')+'</div>'
+          + '</div>';
     html += '<div class="feed-grid">';
     items.forEach(function(item, i){
-      html += renderCard(item, i === 0 && items.length > 2);
+      html += renderCard(item, i===0 && items.length > 2);
     });
     html += '</div>';
   });
@@ -753,95 +761,91 @@ function renderAll(){
 }
 
 function renderCard(item, featured){
-  const cls  = 'card' + (featured ? ' featured' : '');
-  const time = item.time ? relTime(item.time) : '';
-  const srcCls = { news:'news', bing:'bing', reddit:'reddit', hn:'hn' }[item.source] || 'news';
-
-  return '<a class="'+cls+'" href="'+escHtml(item.url)+'" target="_blank" rel="noopener">' +
-    '<div class="card-source-row">' +
-      '<span class="card-source '+srcCls+'">'+escHtml(item.sourceLabel)+'</span>' +
-      '<span class="card-time">'+escHtml(time)+'</span>' +
-    '</div>' +
-    '<div class="card-title">'+escHtml(item.title)+'</div>' +
-    (item.body ? '<div class="card-body">'+escHtml(item.body)+'</div>' : '') +
-    '<div class="card-meta-row">' +
-      '<span class="card-author">'+escHtml(item.author||'')+'</span>' +
-      '<span class="card-arrow">→</span>' +
-    '</div>' +
-  '</a>';
+  const cls    = 'card' + (featured ? ' featured' : '');
+  const time   = item.time ? relTime(item.time) : '';
+  const srcCls = {news:'news', bing:'bing', reddit:'reddit', hn:'hn'}[item.source] || 'news';
+  return '<a class="'+cls+'" href="'+esc(item.url)+'" target="_blank" rel="noopener">'
+    + '<div class="card-source-row">'
+    +   '<span class="card-source '+srcCls+'">'+esc(item.sourceLabel)+'</span>'
+    +   '<span class="card-time">'+esc(time)+'</span>'
+    + '</div>'
+    + '<div class="card-title">'+esc(item.title)+'</div>'
+    + (item.body ? '<div class="card-body">'+esc(item.body)+'</div>' : '')
+    + '<div class="card-meta-row">'
+    +   '<span class="card-author">'+esc(item.author||'')+'</span>'
+    +   '<span class="card-arrow">→</span>'
+    + '</div>'
+    + '</a>';
 }
 
 function renderLoading(){
   document.getElementById('feed-root').innerHTML =
-    '<div class="feed-grid">' +
-    '<div class="feed-state"><div class="spinner"></div>Fetching from all sources…</div>' +
-    '</div>';
+    '<div class="feed-grid"><div class="feed-state"><div class="spinner"></div>Fetching from all sources…</div></div>';
   document.getElementById('total-count').textContent = '—';
 }
 
-function renderError(failedCount, totalCount){
-  const isAllFailed = failedCount === totalCount;
+function renderError(){
+  const failed = Object.keys(chipSucceeded).filter(k => chipSucceeded[k]===false).length;
+  const succeeded = Object.keys(chipSucceeded).filter(k => chipSucceeded[k]===true).length;
   document.getElementById('feed-root').innerHTML =
-    '<div class="feed-grid"><div class="feed-state" style="text-align:left;padding:2rem 2.5rem;">' +
-    '<div style="font-family:var(--sans);font-size:1.1rem;font-weight:700;color:var(--red);margin-bottom:1rem;">' +
-      (isAllFailed ? '⚠ All sources blocked in this preview' : '⚠ '+failedCount+' source(s) failed') +
-    '</div>' +
-    '<div style="font-size:0.76rem;color:var(--muted);line-height:1.9;max-width:520px;">' +
-      (isAllFailed
-        ? 'This page is running inside a sandboxed preview that blocks all outbound network requests. ' +
-          'This is expected — the feed <strong style="color:var(--text)">will work correctly</strong> once uploaded to GitHub Pages or opened in a real browser.<br><br>' +
-          'Upload <code style="color:var(--accent);font-size:0.7rem;">projects/dyson-feed/index.html</code> to your repo and open it there.'
-        : 'Some sources could not be reached. The source chips above show which ones failed (red). ' +
-          'This may be a temporary API issue — try refreshing.') +
-    '</div>' +
-    '</div></div>';
+    '<div class="feed-grid"><div class="feed-state" style="text-align:left;padding:2rem 2.5rem;">'
+    + '<div style="font-family:var(--sans);font-size:1.1rem;font-weight:700;color:var(--red);margin-bottom:1rem;">⚠ No results loaded</div>'
+    + '<div style="font-size:0.76rem;color:var(--muted);line-height:2;max-width:520px;">'
+    + 'All sources returned empty or were blocked. This usually means:<br>'
+    + '&nbsp;· The preview sandbox is blocking outbound requests (expected here)<br>'
+    + '&nbsp;· A CORS proxy is temporarily down — try refreshing<br><br>'
+    + '<strong style="color:var(--text)">On GitHub Pages this will work correctly.</strong> Upload to your repo and open it there.'
+    + '</div></div></div>';
 }
 
-// ─── UTILITIES ─────────────────────────────────────────────────────────────────
+// ─── UTILITIES ───────────────────────────────────────────────────────────────
 
-function relTime(date){
-  const diff = (Date.now() - date.getTime()) / 1000;
-  if(diff < 60)   return 'just now';
-  if(diff < 3600) return Math.floor(diff/60)+'m ago';
-  if(diff < 86400) return Math.floor(diff/3600)+'h ago';
-  if(diff < 604800) return Math.floor(diff/86400)+'d ago';
-  return date.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+function relTime(d){
+  const s = (Date.now()-d.getTime())/1000;
+  if(s<60)     return 'just now';
+  if(s<3600)   return Math.floor(s/60)+'m ago';
+  if(s<86400)  return Math.floor(s/3600)+'h ago';
+  if(s<604800) return Math.floor(s/86400)+'d ago';
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
 }
 
 function stripHtml(s){
-  return s.replace(/<[^>]*>/g,'').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/\s+/g,' ').trim();
+  return String(s||'').replace(/<[^>]*>/g,'')
+    .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>')
+    .replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/\s+/g,' ').trim();
 }
 
 function cleanTitle(s){
-  // Remove Google News source suffix like " - BBC News"
-  return stripHtml(s).replace(/\s*-\s*[^-]+$/, '').trim() || stripHtml(s);
+  return stripHtml(s).replace(/\s*-\s*[^-]{2,}$/, '').trim() || stripHtml(s);
 }
 
-function escHtml(s){
+function esc(s){
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-function parseRSS(xmlText, source, label){
+function parseRSS(xml, source, label){
   try {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(xmlText, 'application/xml');
-    const items = Array.from(doc.querySelectorAll('item')).slice(0, 8);
-    return items.map(function(el, i){
+    const doc   = new DOMParser().parseFromString(xml, 'application/xml');
+    const nodes = Array.from(doc.querySelectorAll('item')).slice(0,8);
+    return nodes.map(function(el, i){
+      const link = el.querySelector('link');
+      // <link> in RSS is a text node sibling, not an attribute
+      const url  = (link && (link.textContent || link.nextSibling && link.nextSibling.textContent)) || '#';
       return {
-        source: source,
-        sourceLabel: label,
-        title: cleanTitle(el.querySelector('title')?.textContent || ''),
-        url: el.querySelector('link')?.textContent || '#',
-        body: stripHtml(el.querySelector('description')?.textContent || ''),
-        author: el.querySelector('author, dc\\:creator')?.textContent || label,
-        time: el.querySelector('pubDate') ? new Date(el.querySelector('pubDate').textContent) : null,
-        featured: i === 0
+        source, sourceLabel: label,
+        title:  cleanTitle(el.querySelector('title')?.textContent || ''),
+        url:    url.trim(),
+        body:   stripHtml(el.querySelector('description')?.textContent || ''),
+        author: el.querySelector('author, dc\\:creator')?.textContent?.trim() || label,
+        time:   el.querySelector('pubDate')
+                  ? new Date(el.querySelector('pubDate').textContent) : null,
+        featured: i===0
       };
-    });
+    }).filter(function(item){ return item.title && item.url !== '#'; });
   } catch(e){ return []; }
 }
 
-// ─── INIT ──────────────────────────────────────────────────────────────────────
+// ─── INIT ────────────────────────────────────────────────────────────────────
 
 fetchAll();
 
