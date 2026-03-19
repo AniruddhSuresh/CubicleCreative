@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dyson Signal — CubicleCreative</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0b;
+      --surface: #111113;
+      --surface2: #18181c;
+      --border: #222226;
+      --text: #f0f0ee;
+      --muted: #666672;
+      --accent: #c8f542;      /* electric lime */
+      --accent2: #f5a623;     /* amber */
+      --red: #ff4545;
+      --blue: #4599ff;
+      --mono: 'Space Mono', monospace;
+      --sans: 'Syne', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 14px;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Noise overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.4;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      padding: 2rem 3rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .header-left { display: flex; flex-direction: column; gap: 0.3rem; }
+
+    .back-link {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.06em;
+      transition: color 0.15s;
+      margin-bottom: 0.4rem;
+      display: inline-block;
+    }
+    .back-link:hover { color: var(--accent); }
+
+    .site-title {
+      font-family: var(--sans);
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    .site-title span {
+      color: var(--accent);
+    }
+
+    .tagline {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-top: 0.4rem;
+    }
+
+    .header-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.5rem;
+    }
+
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 0.3rem 0.7rem;
+    }
+
+    .live-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: blink 1.6s ease-in-out infinite;
+    }
+
+    .last-updated {
+      font-size: 0.62rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+
+    /* ── SOURCES BAR ── */
+    .sources-bar {
+      padding: 0.8rem 3rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+      background: var(--surface);
+    }
+
+    .sources-label {
+      font-size: 0.62rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-right: 0.5rem;
+    }
+
+    .source-chip {
+      font-size: 0.62rem;
+      letter-spacing: 0.06em;
+      padding: 0.2rem 0.55rem;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.15s;
+      background: var(--bg);
+      user-select: none;
+    }
+
+    .source-chip:hover { border-color: var(--muted); color: var(--text); }
+    .source-chip.active { border-color: var(--accent); color: var(--accent); background: rgba(200,245,66,0.06); }
+    .source-chip.loading { border-color: var(--accent2); color: var(--accent2); animation: chipPulse 1s ease-in-out infinite; }
+    .source-chip.error { border-color: var(--red); color: var(--red); }
+    .source-chip.ok { border-color: #3a5a2a; color: var(--accent); }
+
+    /* ── MAIN GRID ── */
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 2rem 6rem;
+    }
+
+    /* ── FEED GRID ── */
+    .feed-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-bottom: 2rem;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--surface);
+      padding: 1.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+      transition: background 0.15s;
+      position: relative;
+      animation: cardIn 0.3s ease both;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .card:hover { background: var(--surface2); }
+
+    .card-source-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .card-source {
+      font-size: 0.58rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.18rem 0.5rem;
+      border: 1px solid;
+    }
+
+    .card-source.news    { color: var(--blue);   border-color: rgba(69,153,255,0.3);  background: rgba(69,153,255,0.05); }
+    .card-source.reddit  { color: var(--accent2); border-color: rgba(245,166,35,0.3);  background: rgba(245,166,35,0.05); }
+    .card-source.hn      { color: #ff6600;        border-color: rgba(255,102,0,0.3);   background: rgba(255,102,0,0.05); }
+    .card-source.bing    { color: #00b4d8;        border-color: rgba(0,180,216,0.3);   background: rgba(0,180,216,0.05); }
+
+    .card-time {
+      font-size: 0.6rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      font-style: italic;
+    }
+
+    .card-title {
+      font-family: var(--sans);
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.45;
+      letter-spacing: -0.01em;
+    }
+
+    .card:hover .card-title { color: var(--accent); }
+
+    .card-body {
+      font-size: 0.74rem;
+      color: var(--muted);
+      line-height: 1.75;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto;
+      padding-top: 0.6rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .card-author {
+      font-size: 0.6rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+
+    .card-arrow {
+      font-size: 0.7rem;
+      color: var(--muted);
+      transition: color 0.15s, transform 0.15s;
+    }
+    .card:hover .card-arrow { color: var(--accent); transform: translateX(3px); }
+
+    /* Featured card (first result per source) */
+    .card.featured {
+      grid-column: span 2;
+    }
+
+    .card.featured .card-title {
+      font-size: 1.15rem;
+    }
+
+    /* ── EMPTY / LOADING / ERROR STATES ── */
+    .feed-state {
+      grid-column: 1 / -1;
+      padding: 3rem 2rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.78rem;
+      letter-spacing: 0.06em;
+    }
+
+    .feed-state .spinner {
+      width: 24px; height: 24px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    /* ── SECTION HEADERS ── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      margin-top: 2rem;
+    }
+
+    .section-header:first-of-type { margin-top: 0; }
+
+    .section-label {
+      font-family: var(--sans);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .section-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .section-count {
+      font-size: 0.62rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+    }
+
+    /* ── CONTROLS ── */
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      padding: 1.2rem 0;
+      border-top: 1px solid var(--border);
+      margin-top: 1rem;
+    }
+
+    .refresh-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      background: var(--accent);
+      color: #0a0a0b;
+      border: none;
+      padding: 0.75rem 1.8rem;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+
+    .refresh-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .refresh-btn:active { transform: translateY(0); }
+    .refresh-btn:disabled { opacity: 0.4; cursor: default; transform: none; }
+
+    .refresh-icon { font-size: 1rem; transition: transform 0.4s; }
+    .refresh-btn.spinning .refresh-icon { animation: spin 0.7s linear infinite; }
+
+    .controls-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    .total-count {
+      font-family: var(--sans);
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 1.6rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .footer-sources {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-source { color: var(--muted); }
+    .footer-source span { color: var(--accent); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0.2; } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes chipPulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+    @keyframes cardIn {
+      from { opacity:0; transform:translateY(8px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    @media (max-width: 700px) {
+      .header, .sources-bar, footer { padding-left: 1.2rem; padding-right: 1.2rem; }
+      main { padding: 1.2rem 1.2rem 4rem; }
+      .feed-grid { grid-template-columns: 1fr; }
+      .card.featured { grid-column: span 1; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-left">
+    <a class="back-link" href="../../index.html">← CubicleCreative</a>
+    <div class="site-title">Dyson <span>Signal</span></div>
+    <div class="tagline">Live feed // News · Reddit · Hacker News · Community</div>
+  </div>
+  <div class="header-right">
+    <div class="live-badge"><div class="live-dot"></div> Live</div>
+    <div class="last-updated" id="last-updated">Not yet fetched</div>
+  </div>
+</header>
+
+<div class="sources-bar">
+  <span class="sources-label">Sources</span>
+  <div class="source-chip active" id="chip-gnews"   data-id="gnews">Google News</div>
+  <div class="source-chip active" id="chip-bing"    data-id="bing">Bing News</div>
+  <div class="source-chip active" id="chip-reddit"  data-id="reddit">Reddit</div>
+  <div class="source-chip active" id="chip-hn"      data-id="hn">Hacker News</div>
+  <div class="source-chip active" id="chip-dysonr"  data-id="dysonr">r/dyson</div>
+  <div class="source-chip active" id="chip-vacuum"  data-id="vacuum">r/VacuumCleaners</div>
+</div>
+
+<main>
+  <div id="feed-root"></div>
+
+  <div class="controls">
+    <button class="refresh-btn" id="refresh-btn" onclick="fetchAll()">
+      <span class="refresh-icon">↻</span> Refresh Feed
+    </button>
+    <div class="controls-right">
+      <div>
+        <div class="total-count" id="total-count">—</div>
+        <div>results loaded</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <span>CubicleCreative // Dyson Signal</span>
+  <div class="footer-sources">
+    <span class="footer-source">Google News <span>RSS</span></span>
+    <span class="footer-source">Bing News <span>RSS</span></span>
+    <span class="footer-source">Reddit <span>JSON API</span></span>
+    <span class="footer-source">Hacker News <span>Algolia API</span></span>
+  </div>
+</footer>
+
+<script>
+(function(){
+'use strict';
+
+// ─── CONFIG ────────────────────────────────────────────────────────────────────
+
+const RSS2JSON   = 'https://api.rss2json.com/v1/api.json?rss_url=';
+const GNEWS_URL  = 'https://news.google.com/rss/search?q=dyson+vacuum&hl=en-US&gl=US&ceid=US:en';
+const BING_URL   = 'https://www.bing.com/news/search?q=dyson+vacuum&format=rss';
+
+const REDDIT_SEARCH  = 'https://www.reddit.com/search.json?q=dyson+vacuum&sort=new&limit=8&restrict_sr=false&t=week';
+const REDDIT_DYSON   = 'https://www.reddit.com/r/dyson/new.json?limit=6';
+const REDDIT_VACUUM  = 'https://www.reddit.com/r/VacuumCleaners/search.json?q=dyson&sort=new&limit=6&restrict_sr=true&t=month';
+const HN_URL         = 'https://hn.algolia.com/api/v1/search?query=dyson+vacuum&tags=story&hitsPerPage=8';
+
+// ─── STATE ─────────────────────────────────────────────────────────────────────
+
+const enabled = { gnews:true, bing:true, reddit:true, hn:true, dysonr:true, vacuum:true };
+let allResults = [];
+
+// ─── SOURCE CHIPS ─────────────────────────────────────────────────────────────
+
+document.querySelectorAll('.source-chip').forEach(function(chip){
+  chip.addEventListener('click', function(){
+    const id = this.dataset.id;
+    enabled[id] = !enabled[id];
+    this.classList.toggle('active', enabled[id]);
+    renderAll();
+  });
+});
+
+function setChipState(id, state){
+  const chip = document.getElementById('chip-'+id);
+  if(!chip) return;
+  chip.className = 'source-chip ' + state;
+}
+
+// ─── FETCH ALL ─────────────────────────────────────────────────────────────────
+
+window.fetchAll = async function(){
+  const btn = document.getElementById('refresh-btn');
+  btn.classList.add('spinning');
+  btn.disabled = true;
+  allResults = [];
+  renderLoading();
+
+  Object.keys(enabled).forEach(k => setChipState(k, 'loading'));
+
+  await Promise.allSettled([
+    fetchGNews(),
+    fetchBing(),
+    fetchRedditSearch(),
+    fetchRedditDyson(),
+    fetchRedditVacuum(),
+    fetchHN()
+  ]);
+
+  const now = new Date();
+  document.getElementById('last-updated').textContent =
+    'Updated ' + now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+
+  btn.classList.remove('spinning');
+  btn.disabled = false;
+
+  if(allResults.length === 0){
+    // Count how many chips are in error state
+    const errored = Object.keys(enabled).filter(k => {
+      const chip = document.getElementById('chip-'+k);
+      return chip && chip.className.includes('error');
+    }).length;
+    renderError(errored, Object.keys(enabled).length);
+    document.getElementById('total-count').textContent = '0';
+  } else {
+    renderAll();
+  }
+};
+
+// ─── FETCH HELPERS ─────────────────────────────────────────────────────────────
+
+async function fetchRSS(url, source, label, chipId){
+  try {
+    const endpoint = RSS2JSON + encodeURIComponent(url) + '&count=8';
+    const res  = await fetch(endpoint);
+    const data = await res.json();
+    if(!data.items || !data.items.length) throw new Error('empty');
+    const items = data.items.slice(0, 8).map(function(item, i){
+      return {
+        source: source,
+        sourceLabel: label,
+        title: cleanTitle(item.title || ''),
+        url: item.link || item.url || '#',
+        body: stripHtml(item.description || item.content || ''),
+        author: item.author || (data.feed && data.feed.title) || label,
+        time: item.pubDate ? new Date(item.pubDate) : null,
+        featured: i === 0
+      };
+    });
+    allResults = allResults.concat(items);
+    setChipState(chipId, 'ok');
+  } catch(e) {
+    setChipState(chipId, 'error');
+    // Fallback: try alternate RSS proxy
+    try {
+      const alt = 'https://corsproxy.io/?' + encodeURIComponent(url);
+      const res = await fetch(alt);
+      const text = await res.text();
+      const parsed = parseRSS(text, source, label);
+      if(parsed.length){
+        allResults = allResults.concat(parsed.slice(0,8));
+        setChipState(chipId, 'ok');
+      }
+    } catch(_){}
+  }
+}
+
+function fetchGNews(){ return fetchRSS(GNEWS_URL, 'news', 'Google News', 'gnews'); }
+function fetchBing(){  return fetchRSS(BING_URL,  'bing', 'Bing News',   'bing'); }
+
+async function fetchRedditSearch(){
+  try {
+    const res  = await fetch(REDDIT_SEARCH, {headers:{'User-Agent':'DysonSignal/1.0'}});
+    const data = await res.json();
+    const posts = (data.data && data.data.children) || [];
+    const items = posts.slice(0, 8).map(function(p, i){
+      const d = p.data;
+      return {
+        source: 'reddit',
+        sourceLabel: 'Reddit',
+        title: d.title || '',
+        url: 'https://reddit.com' + (d.permalink || ''),
+        body: d.selftext ? d.selftext.slice(0,200) : ('r/'+d.subreddit+' · '+Math.round((d.score||0))+' upvotes'),
+        author: 'u/' + (d.author || 'unknown') + ' · r/' + (d.subreddit||'reddit'),
+        time: d.created_utc ? new Date(d.created_utc * 1000) : null,
+        featured: i === 0,
+        thumb: d.thumbnail && d.thumbnail.startsWith('http') ? d.thumbnail : null
+      };
+    });
+    allResults = allResults.concat(items);
+    setChipState('reddit', 'ok');
+  } catch(e){ setChipState('reddit','error'); }
+}
+
+async function fetchRedditDyson(){
+  try {
+    const res  = await fetch(REDDIT_DYSON, {headers:{'User-Agent':'DysonSignal/1.0'}});
+    const data = await res.json();
+    const posts = (data.data && data.data.children) || [];
+    const items = posts.slice(0, 6).map(function(p, i){
+      const d = p.data;
+      return {
+        source: 'reddit',
+        sourceLabel: 'r/dyson',
+        title: d.title || '',
+        url: 'https://reddit.com' + (d.permalink || ''),
+        body: d.selftext ? d.selftext.slice(0,200) : (Math.round(d.score||0)+' upvotes · '+Math.round(d.num_comments||0)+' comments'),
+        author: 'u/' + (d.author || 'unknown'),
+        time: d.created_utc ? new Date(d.created_utc * 1000) : null,
+        featured: false
+      };
+    });
+    allResults = allResults.concat(items);
+    setChipState('dysonr', 'ok');
+  } catch(e){ setChipState('dysonr','error'); }
+}
+
+async function fetchRedditVacuum(){
+  try {
+    const res  = await fetch(REDDIT_VACUUM, {headers:{'User-Agent':'DysonSignal/1.0'}});
+    const data = await res.json();
+    const posts = (data.data && data.data.children) || [];
+    const items = posts.slice(0, 6).map(function(p, i){
+      const d = p.data;
+      return {
+        source: 'reddit',
+        sourceLabel: 'r/VacuumCleaners',
+        title: d.title || '',
+        url: 'https://reddit.com' + (d.permalink || ''),
+        body: d.selftext ? d.selftext.slice(0,200) : (Math.round(d.score||0)+' upvotes · '+Math.round(d.num_comments||0)+' comments'),
+        author: 'u/' + (d.author || 'unknown'),
+        time: d.created_utc ? new Date(d.created_utc * 1000) : null,
+        featured: false
+      };
+    });
+    allResults = allResults.concat(items);
+    setChipState('vacuum', 'ok');
+  } catch(e){ setChipState('vacuum','error'); }
+}
+
+async function fetchHN(){
+  try {
+    const res  = await fetch(HN_URL);
+    const data = await res.json();
+    const hits = (data.hits || []).filter(function(h){ return h.title; });
+    const items = hits.slice(0,8).map(function(h, i){
+      return {
+        source: 'hn',
+        sourceLabel: 'Hacker News',
+        title: h.title,
+        url: h.url || ('https://news.ycombinator.com/item?id=' + h.objectID),
+        body: (h.points||0)+' points · '+(h.num_comments||0)+' comments',
+        author: h.author || 'HN',
+        time: h.created_at ? new Date(h.created_at) : null,
+        featured: i === 0
+      };
+    });
+    allResults = allResults.concat(items);
+    setChipState('hn', 'ok');
+  } catch(e){ setChipState('hn','error'); }
+}
+
+// ─── RENDER ────────────────────────────────────────────────────────────────────
+
+const SOURCE_MAP = {
+  gnews: 'gnews',
+  bing:  'bing',
+  reddit:'reddit',
+  hn:    'hn',
+  dysonr:'dysonr',
+  vacuum:'vacuum'
+};
+
+// Map sourceLabel back to enabled key
+function getEnabledKey(item){
+  if(item.source === 'hn')    return 'hn';
+  if(item.source === 'news')  return 'gnews';
+  if(item.source === 'bing')  return 'bing';
+  if(item.sourceLabel === 'r/dyson')         return 'dysonr';
+  if(item.sourceLabel === 'r/VacuumCleaners')return 'vacuum';
+  if(item.source === 'reddit') return 'reddit';
+  return null;
+}
+
+function renderAll(){
+  const root = document.getElementById('feed-root');
+
+  // Filter by enabled sources
+  const visible = allResults.filter(function(item){
+    const key = getEnabledKey(item);
+    return key ? enabled[key] : true;
+  });
+
+  if(!visible.length){
+    root.innerHTML = '<div class="section-header"><div class="section-line"></div></div>' +
+      '<div class="feed-grid"><div class="feed-state">No results. Try refreshing or enabling more sources.</div></div>';
+    document.getElementById('total-count').textContent = '0';
+    return;
+  }
+
+  // Sort newest first
+  visible.sort(function(a,b){
+    if(!a.time && !b.time) return 0;
+    if(!a.time) return 1;
+    if(!b.time) return -1;
+    return b.time - a.time;
+  });
+
+  // Group by source label
+  const groups = {};
+  visible.forEach(function(item){
+    const g = item.sourceLabel || item.source;
+    if(!groups[g]) groups[g] = [];
+    groups[g].push(item);
+  });
+
+  let html = '';
+  const groupOrder = ['Google News','Bing News','Reddit','r/dyson','r/VacuumCleaners','Hacker News'];
+
+  groupOrder.forEach(function(gname){
+    if(!groups[gname]) return;
+    const items = groups[gname];
+    html += '<div class="section-header"><div class="section-label">'+gname+'</div><div class="section-line"></div><div class="section-count">'+items.length+' result'+(items.length!==1?'s':'')+'</div></div>';
+    html += '<div class="feed-grid">';
+    items.forEach(function(item, i){
+      html += renderCard(item, i === 0 && items.length > 2);
+    });
+    html += '</div>';
+  });
+
+  root.innerHTML = html;
+  document.getElementById('total-count').textContent = visible.length;
+}
+
+function renderCard(item, featured){
+  const cls  = 'card' + (featured ? ' featured' : '');
+  const time = item.time ? relTime(item.time) : '';
+  const srcCls = { news:'news', bing:'bing', reddit:'reddit', hn:'hn' }[item.source] || 'news';
+
+  return '<a class="'+cls+'" href="'+escHtml(item.url)+'" target="_blank" rel="noopener">' +
+    '<div class="card-source-row">' +
+      '<span class="card-source '+srcCls+'">'+escHtml(item.sourceLabel)+'</span>' +
+      '<span class="card-time">'+escHtml(time)+'</span>' +
+    '</div>' +
+    '<div class="card-title">'+escHtml(item.title)+'</div>' +
+    (item.body ? '<div class="card-body">'+escHtml(item.body)+'</div>' : '') +
+    '<div class="card-meta-row">' +
+      '<span class="card-author">'+escHtml(item.author||'')+'</span>' +
+      '<span class="card-arrow">→</span>' +
+    '</div>' +
+  '</a>';
+}
+
+function renderLoading(){
+  document.getElementById('feed-root').innerHTML =
+    '<div class="feed-grid">' +
+    '<div class="feed-state"><div class="spinner"></div>Fetching from all sources…</div>' +
+    '</div>';
+  document.getElementById('total-count').textContent = '—';
+}
+
+function renderError(failedCount, totalCount){
+  const isAllFailed = failedCount === totalCount;
+  document.getElementById('feed-root').innerHTML =
+    '<div class="feed-grid"><div class="feed-state" style="text-align:left;padding:2rem 2.5rem;">' +
+    '<div style="font-family:var(--sans);font-size:1.1rem;font-weight:700;color:var(--red);margin-bottom:1rem;">' +
+      (isAllFailed ? '⚠ All sources blocked in this preview' : '⚠ '+failedCount+' source(s) failed') +
+    '</div>' +
+    '<div style="font-size:0.76rem;color:var(--muted);line-height:1.9;max-width:520px;">' +
+      (isAllFailed
+        ? 'This page is running inside a sandboxed preview that blocks all outbound network requests. ' +
+          'This is expected — the feed <strong style="color:var(--text)">will work correctly</strong> once uploaded to GitHub Pages or opened in a real browser.<br><br>' +
+          'Upload <code style="color:var(--accent);font-size:0.7rem;">projects/dyson-feed/index.html</code> to your repo and open it there.'
+        : 'Some sources could not be reached. The source chips above show which ones failed (red). ' +
+          'This may be a temporary API issue — try refreshing.') +
+    '</div>' +
+    '</div></div>';
+}
+
+// ─── UTILITIES ─────────────────────────────────────────────────────────────────
+
+function relTime(date){
+  const diff = (Date.now() - date.getTime()) / 1000;
+  if(diff < 60)   return 'just now';
+  if(diff < 3600) return Math.floor(diff/60)+'m ago';
+  if(diff < 86400) return Math.floor(diff/3600)+'h ago';
+  if(diff < 604800) return Math.floor(diff/86400)+'d ago';
+  return date.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+}
+
+function stripHtml(s){
+  return s.replace(/<[^>]*>/g,'').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/\s+/g,' ').trim();
+}
+
+function cleanTitle(s){
+  // Remove Google News source suffix like " - BBC News"
+  return stripHtml(s).replace(/\s*-\s*[^-]+$/, '').trim() || stripHtml(s);
+}
+
+function escHtml(s){
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function parseRSS(xmlText, source, label){
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(xmlText, 'application/xml');
+    const items = Array.from(doc.querySelectorAll('item')).slice(0, 8);
+    return items.map(function(el, i){
+      return {
+        source: source,
+        sourceLabel: label,
+        title: cleanTitle(el.querySelector('title')?.textContent || ''),
+        url: el.querySelector('link')?.textContent || '#',
+        body: stripHtml(el.querySelector('description')?.textContent || ''),
+        author: el.querySelector('author, dc\\:creator')?.textContent || label,
+        time: el.querySelector('pubDate') ? new Date(el.querySelector('pubDate').textContent) : null,
+        featured: i === 0
+      };
+    });
+  } catch(e){ return []; }
+}
+
+// ─── INIT ──────────────────────────────────────────────────────────────────────
+
+fetchAll();
+
+})();
+</script>
+</body>
+</html>
