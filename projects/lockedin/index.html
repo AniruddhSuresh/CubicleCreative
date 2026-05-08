@@ -1535,10 +1535,13 @@
   }
 
   // ────────────────────────────────────────────────────────────────────────
-  // BLOCK 8: DRAG / SWIPE GESTURES
-  // Supports both mouse and touch. Threshold = 100px to commit a swipe.
+  // BLOCK 8: DRAG / SWIPE GESTURES vs. TAP
+  // Tap = cycle tabs. Drag past threshold = swipe. We start in "pending" mode
+  // and only commit to dragging once the pointer has moved enough that this
+  // can't be a tap. setPointerCapture is delayed until that moment.
   // ────────────────────────────────────────────────────────────────────────
-  const SWIPE_THRESHOLD = 100;
+  const SWIPE_THRESHOLD   = 100;  // px to commit a swipe
+  const DRAG_START_THRESH = 6;    // px movement before we treat as drag, not tap
   let drag = null;
 
   function attachDragHandlers(card){
@@ -1546,31 +1549,53 @@
     card.addEventListener('pointermove', onDragMove);
     card.addEventListener('pointerup',   onDragEnd);
     card.addEventListener('pointercancel', onDragEnd);
+    // Suppress click events that follow a real drag (capture phase = catch first)
+    card.addEventListener('click', onClickGuard, true);
   }
 
   function onDragStart(e){
-    // Don't drag if user is interacting with content (post, tab pill, etc.)
+    // Don't engage on tab pills (they have their own click handler)
     if(e.target.closest('.card-tab-pill')) return;
-    drag = { startX: e.clientX, startY: e.clientY, dx: 0, dy: 0, card: e.currentTarget };
-    drag.card.classList.add('dragging');
-    drag.card.setPointerCapture(e.pointerId);
+
+    // Pending mode — not yet a drag, not yet a tap
+    drag = {
+      startX: e.clientX, startY: e.clientY,
+      dx: 0, dy: 0,
+      card: e.currentTarget,
+      pointerId: e.pointerId,
+      isDragging: false,    // becomes true once threshold is crossed
+      didDrag: false,       // sticky flag: was this gesture ever a drag?
+    };
   }
 
   function onDragMove(e){
-    if(!drag) return;
+    if(!drag || drag.pointerId !== e.pointerId) return;
     drag.dx = e.clientX - drag.startX;
     drag.dy = e.clientY - drag.startY;
 
-    // Only treat as a swipe if horizontal motion dominates
-    if(Math.abs(drag.dx) < 8 && Math.abs(drag.dy) < 8) return;
-    if(Math.abs(drag.dy) > Math.abs(drag.dx) * 1.4){
-      // It's a vertical scroll — release drag
-      cancelDrag();
-      return;
+    // Still pending? Wait until the pointer moves past the threshold
+    if(!drag.isDragging){
+      const absX = Math.abs(drag.dx);
+      const absY = Math.abs(drag.dy);
+      if(absX < DRAG_START_THRESH && absY < DRAG_START_THRESH) return;
+
+      // If motion is more vertical than horizontal, this is a scroll, not a swipe
+      if(absY > absX * 1.4){
+        drag = null;        // release control entirely; let scroll happen
+        return;
+      }
+
+      // Commit to dragging
+      drag.isDragging = true;
+      drag.didDrag    = true;
+      drag.card.classList.add('dragging');
+      drag.card.setPointerCapture(e.pointerId);
     }
 
+    // Active drag — apply transform + overlays
     const rotate = drag.dx * 0.05;
-    drag.card.style.transform = 'translate(' + drag.dx + 'px, ' + (drag.dy * 0.3) + 'px) rotate(' + rotate + 'deg)';
+    drag.card.style.transform =
+      'translate(' + drag.dx + 'px, ' + (drag.dy * 0.3) + 'px) rotate(' + rotate + 'deg)';
 
     const likeOv = document.getElementById('overlay-like');
     const nopeOv = document.getElementById('overlay-nope');
@@ -1580,23 +1605,43 @@
 
   function onDragEnd(e){
     if(!drag) return;
+    if(drag.pointerId !== e.pointerId) return;
+
+    // If we never crossed the drag threshold, this was a tap.
+    // Let the click handler fire normally (do nothing here).
+    if(!drag.isDragging){
+      drag = null;
+      return;
+    }
+
     drag.card.classList.remove('dragging');
-    if(drag.dx > SWIPE_THRESHOLD)       { commitSwipe('right'); }
-    else if(drag.dx < -SWIPE_THRESHOLD) { commitSwipe('left'); }
-    else                                 { resetCardPosition(); }
+    if(drag.dx > SWIPE_THRESHOLD)        commitSwipe('right');
+    else if(drag.dx < -SWIPE_THRESHOLD)  commitSwipe('left');
+    else                                  resetCardPosition();
+
+    // Keep didDrag info around for the click guard, then clear
+    const didDrag = drag.didDrag;
     drag = null;
+
+    // The browser will fire a synthetic 'click' after pointerup. Block it.
+    if(didDrag){
+      window._suppressNextClick = true;
+      setTimeout(() => { window._suppressNextClick = false; }, 50);
+    }
   }
 
-  function cancelDrag(){
-    if(!drag) return;
-    drag.card.classList.remove('dragging');
-    resetCardPosition();
-    drag = null;
+  function onClickGuard(e){
+    if(window._suppressNextClick){
+      e.stopPropagation();
+      e.preventDefault();
+      window._suppressNextClick = false;
+    }
   }
 
   function resetCardPosition(){
-    if(!drag) return;
-    drag.card.style.transform = '';
+    const card = document.getElementById('active-card');
+    if(!card) return;
+    card.style.transform = '';
     const likeOv = document.getElementById('overlay-like');
     const nopeOv = document.getElementById('overlay-nope');
     if(likeOv) likeOv.style.opacity = 0;
