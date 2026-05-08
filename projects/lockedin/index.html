@@ -8,61 +8,40 @@
 
 <!-- ════════════════════════════════════════════════════════════════════════
      STYLES
-     Edit colors/typography/layout in this <style> block. The blocks below
-     are clearly labeled by section.
      ════════════════════════════════════════════════════════════════════════ -->
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   /* ── COLOR TOKENS ─────────────────────────────────────────────────────── */
   :root {
-    --bg:       #f3f2ef;            /* LinkedIn beige */
-    --surface:  #ffffff;
-    --border:   #d6d6cf;
-    --text:     #1d2226;
-    --muted:    #6a6f73;
-    --linkedin: #0a66c2;            /* LinkedIn blue */
-    --tinder:   #fd5068;            /* Tinder red */
-    --tinder2:  #fe8c52;            /* Tinder orange (gradient) */
-    --green:    #2e7d32;
-    --red:      #d32f2f;
-    --soft:     #eef3f8;
+    --bg: #f3f2ef; --surface: #ffffff; --border: #d6d6cf;
+    --text: #1d2226; --muted: #6a6f73;
+    --linkedin: #0a66c2; --tinder: #fd5068; --tinder2: #fe8c52;
+    --green: #2e7d32; --red: #d32f2f; --soft: #eef3f8;
+    --warm: #fff4e6;
   }
 
   html { scroll-behavior: smooth; }
-
   body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    font-weight: 400;
-    min-height: 100vh;
-    overflow-x: hidden;
+    background: var(--bg); color: var(--text);
+    font-family: 'Inter', sans-serif; font-weight: 400;
+    min-height: 100vh; overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
   }
 
   /* ── HEADER ───────────────────────────────────────────────────────────── */
   header {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0.8rem 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0.8rem 2rem; display: flex; align-items: center; justify-content: space-between;
     position: sticky; top: 0; z-index: 50;
   }
-  .logo {
-    font-size: 1.4rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    text-decoration: none;
-  }
+  .logo { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em; text-decoration: none; }
   .logo .locked { color: var(--linkedin); }
   .logo .in     { background: linear-gradient(135deg, var(--tinder), var(--tinder2));
                   -webkit-background-clip: text; background-clip: text; color: transparent; }
   .back-link { font-size: 0.78rem; color: var(--muted); text-decoration: none; }
   .back-link:hover { color: var(--linkedin); }
 
-  /* Tabs in header (only visible when logged in) */
   .header-tabs { display: none; gap: 1.4rem; }
   .header-tabs.visible { display: flex; }
   .tab-btn {
@@ -70,81 +49,66 @@
     font-family: inherit; font-size: 0.85rem; font-weight: 500;
     color: var(--muted); padding: 0.4rem 0.2rem;
     border-bottom: 2px solid transparent;
-    position: relative;
   }
   .tab-btn.active { color: var(--text); border-bottom-color: var(--linkedin); }
   .tab-btn:hover { color: var(--text); }
   .tab-btn .badge {
     background: var(--tinder); color: #fff; font-size: 0.62rem;
-    padding: 0.1rem 0.4rem; border-radius: 8px; margin-left: 0.3rem;
-    font-weight: 600;
+    padding: 0.1rem 0.4rem; border-radius: 8px; margin-left: 0.3rem; font-weight: 600;
   }
 
-  /* ── COMMON CONTAINER ─────────────────────────────────────────────────── */
   main { max-width: 480px; margin: 2rem auto 4rem; padding: 0 1rem; }
 
-  /* ── BUTTONS ──────────────────────────────────────────────────────────── */
+  /* ── BUTTONS / FORMS ──────────────────────────────────────────────────── */
   .btn-primary {
     width: 100%; background: var(--linkedin); color: #fff;
-    border: none; padding: 0.85rem 1rem;
-    font-family: inherit; font-size: 0.9rem; font-weight: 600;
-    border-radius: 24px; cursor: pointer; transition: background 0.15s;
+    border: none; padding: 0.85rem 1rem; font-family: inherit;
+    font-size: 0.9rem; font-weight: 600; border-radius: 24px;
+    cursor: pointer; transition: background 0.15s;
   }
   .btn-primary:hover { background: #084f99; }
   .btn-primary:disabled { background: var(--border); cursor: not-allowed; }
 
-  /* ── INPUTS ───────────────────────────────────────────────────────────── */
-  label { display: block; font-size: 0.78rem; font-weight: 500; color: var(--text); margin-bottom: 0.4rem; }
+  label { display: block; font-size: 0.78rem; font-weight: 500; margin-bottom: 0.4rem; }
   input[type="text"], input[type="password"] {
     width: 100%; background: var(--surface); border: 1px solid var(--border);
     color: var(--text); font-family: inherit; font-size: 0.95rem;
-    padding: 0.7rem 0.9rem; outline: none; transition: border-color 0.15s;
-    border-radius: 4px;
+    padding: 0.7rem 0.9rem; outline: none; transition: border-color 0.15s; border-radius: 4px;
   }
   input:focus { border-color: var(--linkedin); }
 
   .form-card {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: 8px; padding: 2rem 1.8rem;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    border-radius: 8px; padding: 2rem 1.8rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
   }
   .form-group { margin-bottom: 1.1rem; }
-  .form-title {
-    font-size: 1.4rem; font-weight: 700; margin-bottom: 0.4rem;
-    letter-spacing: -0.01em;
-  }
+  .form-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.4rem; letter-spacing: -0.01em; }
   .form-sub { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.6rem; line-height: 1.5; }
 
   /* ── PROFILE CREATION ─────────────────────────────────────────────────── */
-  .stat-row {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0.8rem 0; border-bottom: 1px solid var(--border);
-  }
+  .stat-row { display: flex; align-items: center; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid var(--border); }
   .stat-row:last-of-type { border-bottom: none; }
   .stat-name { font-size: 0.92rem; font-weight: 500; }
   .stat-desc { font-size: 0.7rem; color: var(--muted); margin-top: 0.15rem; }
   .stat-controls { display: flex; align-items: center; gap: 0.6rem; }
   .stat-btn {
     width: 28px; height: 28px; border: 1px solid var(--border);
-    background: var(--surface); border-radius: 50%;
-    cursor: pointer; font-size: 1rem; line-height: 1; color: var(--text);
-    transition: all 0.15s; font-family: inherit;
+    background: var(--surface); border-radius: 50%; cursor: pointer;
+    font-size: 1rem; line-height: 1; color: var(--text); transition: all 0.15s; font-family: inherit;
   }
   .stat-btn:hover:not(:disabled) { border-color: var(--linkedin); color: var(--linkedin); }
   .stat-btn:disabled { opacity: 0.3; cursor: not-allowed; }
   .stat-pips { display: inline-flex; gap: 3px; min-width: 60px; justify-content: center; }
   .pip { width: 8px; height: 8px; border-radius: 50%; background: var(--border); }
   .pip.filled { background: var(--linkedin); }
-
   .points-banner {
-    background: var(--soft); padding: 0.9rem 1rem;
-    border-radius: 6px; margin-bottom: 1.4rem;
-    text-align: center; font-size: 0.85rem;
+    background: var(--soft); padding: 0.9rem 1rem; border-radius: 6px;
+    margin-bottom: 1.4rem; text-align: center; font-size: 0.85rem;
   }
   .points-banner strong { color: var(--linkedin); font-size: 1.1rem; }
 
-  /* ── SWIPE CARD ───────────────────────────────────────────────────────── */
-  .swipe-stack { position: relative; height: 560px; margin-bottom: 1rem; }
+  /* ── SWIPE STACK ──────────────────────────────────────────────────────── */
+  .swipe-stack { position: relative; height: 600px; margin-bottom: 1rem; }
 
   .card {
     position: absolute; inset: 0;
@@ -153,35 +117,40 @@
     box-shadow: 0 4px 20px rgba(0,0,0,0.08);
     display: flex; flex-direction: column;
     transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+    touch-action: pan-y; user-select: none;
   }
-  .card.swipe-right { transform: translateX(150%) rotate(15deg); opacity: 0; }
-  .card.swipe-left  { transform: translateX(-150%) rotate(-15deg); opacity: 0; }
+  .card.dragging { transition: none; cursor: grabbing; }
+  .card.swipe-right { transform: translateX(150%) rotate(15deg) !important; opacity: 0; }
+  .card.swipe-left  { transform: translateX(-150%) rotate(-15deg) !important; opacity: 0; }
 
-  /* Card header with photo */
+  /* Swipe overlays — show LIKE/NOPE while dragging */
+  .swipe-overlay {
+    position: absolute; top: 24px; padding: 0.4rem 1rem;
+    border: 4px solid; border-radius: 8px; font-weight: 800;
+    font-size: 1.4rem; letter-spacing: 0.08em;
+    opacity: 0; transition: opacity 0.1s; pointer-events: none; z-index: 5;
+  }
+  .swipe-overlay.like { right: 24px; color: var(--green); border-color: var(--green); transform: rotate(15deg); }
+  .swipe-overlay.nope { left: 24px;  color: var(--red);   border-color: var(--red);   transform: rotate(-15deg); }
+
+  /* Photo header */
   .card-photo {
     width: 100%; height: 200px;
     display: flex; align-items: center; justify-content: center;
     font-size: 5rem;
     background: linear-gradient(135deg, var(--soft), #c5d8ec);
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0; position: relative;
+    border-bottom: 1px solid var(--border); flex-shrink: 0; position: relative;
   }
   .card-name {
     position: absolute; bottom: 12px; left: 16px; right: 16px;
-    font-size: 1.2rem; font-weight: 700; color: var(--text);
+    font-size: 1.2rem; font-weight: 700;
     background: rgba(255,255,255,0.92); padding: 0.4rem 0.7rem;
     border-radius: 4px; backdrop-filter: blur(4px);
   }
-  .card-name span {
-    display: block; font-size: 0.72rem; font-weight: 500;
-    color: var(--muted); margin-top: 0.1rem;
-  }
+  .card-name span { display: block; font-size: 0.72rem; font-weight: 500; color: var(--muted); margin-top: 0.1rem; }
 
-  /* Tab cycler inside card */
-  .card-tabs {
-    display: flex; gap: 4px; padding: 0.6rem 1rem 0;
-    border-bottom: 1px solid var(--border); flex-shrink: 0;
-  }
+  /* Tabs strip inside card */
+  .card-tabs { display: flex; gap: 4px; padding: 0.6rem 1rem 0; border-bottom: 1px solid var(--border); flex-shrink: 0; }
   .card-tab-pill {
     flex: 1; height: 3px; background: var(--border); border-radius: 2px;
     cursor: pointer; transition: background 0.15s;
@@ -189,8 +158,8 @@
   .card-tab-pill.active { background: var(--linkedin); }
 
   .card-content {
-    flex: 1; padding: 1.2rem 1.2rem 1rem;
-    overflow-y: auto; cursor: pointer;
+    flex: 1; padding: 1.2rem 1.2rem 1rem; overflow-y: auto;
+    cursor: pointer; -webkit-overflow-scrolling: touch;
   }
   .card-section-label {
     font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase;
@@ -199,70 +168,90 @@
   .card-section-body { font-size: 0.85rem; line-height: 1.6; }
   .card-section-body p { margin-bottom: 0.6rem; }
 
+  /* ── BIO additions ────────────────────────────────────────────────────── */
+  .bio-prompt {
+    margin-top: 1rem; padding: 0.8rem; background: var(--soft);
+    border-left: 3px solid var(--linkedin); border-radius: 4px;
+  }
+  .bio-prompt-q {
+    font-size: 0.7rem; letter-spacing: 0.04em; color: var(--muted);
+    text-transform: uppercase; font-weight: 600; margin-bottom: 0.3rem;
+  }
+  .bio-prompt-a { font-size: 0.88rem; line-height: 1.5; font-weight: 500; }
+  .fun-facts { margin-top: 1rem; }
+  .fun-facts ul { list-style: none; padding: 0; }
+  .fun-facts li {
+    padding: 0.4rem 0; border-bottom: 1px dashed var(--border);
+    font-size: 0.82rem; line-height: 1.5;
+  }
+  .fun-facts li::before { content: '✦ '; color: var(--linkedin); }
+
+  /* ── INTEREST tags ────────────────────────────────────────────────────── */
   .interest-tag {
     display: inline-block; background: var(--soft); color: var(--linkedin);
     padding: 0.25rem 0.7rem; border-radius: 12px;
     font-size: 0.75rem; font-weight: 500; margin: 0.2rem 0.3rem 0.2rem 0;
   }
 
-  .experience-item {
-    display: flex; gap: 0.7rem; padding: 0.5rem 0;
-    border-bottom: 1px solid var(--border);
-  }
+  /* ── EXPERIENCE ───────────────────────────────────────────────────────── */
+  .experience-item { display: flex; gap: 0.7rem; padding: 0.5rem 0; border-bottom: 1px solid var(--border); }
   .experience-item:last-child { border-bottom: none; }
-  .experience-icon {
-    font-size: 1.4rem; width: 32px; flex-shrink: 0; text-align: center;
-  }
+  .experience-icon { font-size: 1.4rem; width: 32px; flex-shrink: 0; text-align: center; }
   .experience-detail { flex: 1; min-width: 0; }
   .experience-role { font-size: 0.85rem; font-weight: 600; }
   .experience-company { font-size: 0.78rem; color: var(--muted); margin-top: 0.1rem; }
 
-  .post-card {
-    background: var(--soft); padding: 0.9rem; border-radius: 6px;
-    font-size: 0.85rem; line-height: 1.6;
+  /* ── POSTS (expandable list) ──────────────────────────────────────────── */
+  .post-item {
+    background: var(--soft); padding: 0.8rem; border-radius: 6px;
+    margin-bottom: 0.6rem; cursor: pointer; transition: background 0.15s;
+    border-left: 3px solid transparent;
   }
+  .post-item:hover { background: #e3eaf2; }
+  .post-item.expanded { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--linkedin); cursor: pointer; }
+  .post-preview {
+    font-size: 0.82rem; line-height: 1.5; display: -webkit-box;
+    -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .post-full { font-size: 0.82rem; line-height: 1.7; white-space: pre-wrap; }
+  .post-full p { margin-bottom: 0.6rem; }
   .post-meta {
-    font-size: 0.7rem; color: var(--muted); margin-top: 0.5rem;
+    font-size: 0.7rem; color: var(--muted); margin-top: 0.6rem;
     padding-top: 0.5rem; border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between;
   }
+  .post-time { font-size: 0.68rem; color: var(--muted); margin-bottom: 0.3rem; font-style: italic; }
 
+  /* ── COMMENTS ─────────────────────────────────────────────────────────── */
   .comment {
-    padding: 0.5rem 0; border-bottom: 1px dashed var(--border);
+    padding: 0.6rem 0; border-bottom: 1px dashed var(--border);
     font-size: 0.8rem; line-height: 1.5;
   }
   .comment:last-child { border-bottom: none; }
   .comment-author { font-weight: 600; color: var(--linkedin); }
-
-  /* Tap hint shown briefly */
-  .tap-hint {
-    position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
-    background: rgba(0,0,0,0.7); color: #fff; font-size: 0.7rem;
-    padding: 0.3rem 0.7rem; border-radius: 12px;
-    pointer-events: none; opacity: 0; transition: opacity 0.3s;
-  }
-  .card:hover .tap-hint { opacity: 1; }
+  .comment.negative .comment-author { color: var(--red); }
 
   /* ── SWIPE BUTTONS ────────────────────────────────────────────────────── */
-  .swipe-actions {
-    display: flex; justify-content: center; gap: 1.5rem; margin-top: 1rem;
-  }
+  .swipe-actions { display: flex; justify-content: center; gap: 1.5rem; margin-top: 1rem; }
   .swipe-btn {
     width: 60px; height: 60px; border-radius: 50%;
-    border: 2px solid; background: var(--surface);
-    cursor: pointer; transition: all 0.15s;
-    display: flex; align-items: center; justify-content: center;
+    border: 2px solid; background: var(--surface); cursor: pointer;
+    transition: all 0.15s; display: flex; align-items: center; justify-content: center;
     font-size: 1.6rem;
   }
   .swipe-btn.nope { border-color: var(--red); color: var(--red); }
   .swipe-btn.like { border-color: var(--green); color: var(--green); }
   .swipe-btn:hover { transform: scale(1.1); }
-  .swipe-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .swipe-hint {
+    text-align: center; font-size: 0.7rem; color: var(--muted);
+    margin-top: 0.5rem; letter-spacing: 0.04em;
+  }
 
   /* ── MATCH MODAL ──────────────────────────────────────────────────────── */
   .modal-overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-    display: none; align-items: center; justify-content: center;
-    z-index: 100; padding: 1rem;
+    display: none; align-items: center; justify-content: center; z-index: 100; padding: 1rem;
   }
   .modal-overlay.visible { display: flex; }
   .modal-card {
@@ -270,10 +259,7 @@
     color: #fff; padding: 2.5rem 2rem; border-radius: 16px;
     text-align: center; max-width: 360px; width: 100%;
   }
-  .modal-title {
-    font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem;
-    letter-spacing: -0.02em;
-  }
+  .modal-title { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; letter-spacing: -0.02em; }
   .modal-sub { font-size: 0.95rem; opacity: 0.9; margin-bottom: 1.5rem; }
   .modal-photo {
     font-size: 4rem; margin-bottom: 1rem;
@@ -284,8 +270,7 @@
   .btn-modal {
     background: #fff; color: var(--tinder); border: none;
     padding: 0.7rem 1.5rem; border-radius: 24px;
-    font-weight: 600; cursor: pointer; font-family: inherit;
-    margin: 0.3rem;
+    font-weight: 600; cursor: pointer; font-family: inherit; margin: 0.3rem;
   }
   .btn-modal.ghost { background: transparent; color: #fff; border: 1px solid #fff; }
 
@@ -306,10 +291,17 @@
   .match-info { flex: 1; min-width: 0; }
   .match-name { font-weight: 600; font-size: 0.92rem; }
   .match-tagline { font-size: 0.75rem; color: var(--muted); margin-top: 0.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-  .empty-state {
-    text-align: center; padding: 3rem 1rem; color: var(--muted);
+  .match-status {
+    font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 8px;
+    text-transform: uppercase; font-weight: 600; letter-spacing: 0.04em; flex-shrink: 0;
   }
+  .match-status.active     { background: var(--soft); color: var(--linkedin); }
+  .match-status.success    { background: #e0f2e9; color: var(--green); }
+  .match-status.failed     { background: #fde0e0; color: var(--red); }
+  .match-status.ghosted    { background: #eee; color: var(--muted); }
+  .match-status.scammed    { background: var(--warm); color: #b56c00; }
+
+  .empty-state { text-align: center; padding: 3rem 1rem; color: var(--muted); }
   .empty-state h2 { color: var(--text); margin-bottom: 0.5rem; font-size: 1.4rem; }
   .empty-state p { font-size: 0.9rem; line-height: 1.6; }
 
@@ -322,25 +314,74 @@
   .chat-header .match-photo { width: 38px; height: 38px; font-size: 1.2rem; }
   .chat-back {
     background: none; border: none; cursor: pointer;
-    font-size: 1.2rem; color: var(--muted); margin-right: 0.3rem;
-    padding: 0.2rem;
+    font-size: 1.2rem; color: var(--muted); margin-right: 0.3rem; padding: 0.2rem;
   }
+
   .chat-body {
-    background: var(--surface); border: 1px solid var(--border);
-    border-top: none; min-height: 360px; padding: 1rem;
-    font-size: 0.85rem; color: var(--muted); text-align: center;
-    display: flex; align-items: center; justify-content: center;
-    line-height: 1.7;
+    background: var(--surface); border: 1px solid var(--border); border-top: none;
+    min-height: 400px; max-height: 540px; padding: 1rem; overflow-y: auto;
+    display: flex; flex-direction: column; gap: 0.7rem;
   }
-  .chat-input-row {
-    background: var(--surface); border: 1px solid var(--border);
-    border-top: none; border-radius: 0 0 8px 8px;
-    padding: 0.7rem; display: flex; gap: 0.5rem;
+
+  .chat-msg {
+    max-width: 78%; padding: 0.6rem 0.85rem; border-radius: 16px;
+    font-size: 0.85rem; line-height: 1.5; word-wrap: break-word;
+    animation: fadeUp 0.25s ease both;
   }
-  .chat-input-row input { flex: 1; }
-  .chat-input-row button {
-    background: var(--linkedin); color: #fff; border: none;
-    padding: 0 1rem; border-radius: 4px; cursor: pointer; font-weight: 500;
+  .chat-msg.npc  { align-self: flex-start; background: var(--soft); border-bottom-left-radius: 4px; }
+  .chat-msg.user { align-self: flex-end;   background: var(--linkedin); color: #fff; border-bottom-right-radius: 4px; }
+  .chat-msg-author { font-size: 0.65rem; color: var(--muted); margin-bottom: 0.2rem; padding: 0 0.3rem; }
+  .chat-msg.npc + .chat-msg-author,
+  .chat-msg-author + .chat-msg.npc { /* spacing handled by gap */ }
+
+  .chat-typing {
+    align-self: flex-start; display: inline-flex; gap: 4px;
+    background: var(--soft); padding: 0.7rem 0.9rem; border-radius: 16px; border-bottom-left-radius: 4px;
+  }
+  .chat-typing .dot {
+    width: 6px; height: 6px; background: var(--muted); border-radius: 50%;
+    animation: bounce 1s infinite ease-in-out;
+  }
+  .chat-typing .dot:nth-child(2) { animation-delay: 0.15s; }
+  .chat-typing .dot:nth-child(3) { animation-delay: 0.3s; }
+
+  .chat-options {
+    background: var(--surface); border: 1px solid var(--border); border-top: none;
+    padding: 0.7rem; display: flex; flex-direction: column; gap: 0.5rem;
+  }
+  .chat-option {
+    background: var(--surface); border: 1px solid var(--linkedin); color: var(--linkedin);
+    padding: 0.6rem 0.9rem; border-radius: 18px; font-family: inherit;
+    font-size: 0.83rem; cursor: pointer; transition: all 0.15s;
+    text-align: left; line-height: 1.4;
+  }
+  .chat-option:hover { background: var(--linkedin); color: #fff; }
+  .chat-option:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .chat-end-banner {
+    padding: 1rem; text-align: center; font-size: 0.85rem; line-height: 1.6;
+    border-radius: 0 0 8px 8px; border: 1px solid var(--border); border-top: none;
+  }
+  .chat-end-banner.success { background: #e0f2e9; color: var(--green); border-color: #c5e1cf; }
+  .chat-end-banner.failed  { background: #fde0e0; color: var(--red);   border-color: #f5c8c8; }
+  .chat-end-banner.ghosted { background: #f5f5f5; color: var(--muted); }
+  .chat-end-banner.scammed { background: var(--warm); color: #b56c00; border-color: #f0d9b3; }
+  .chat-end-banner strong { display: block; font-size: 0.95rem; margin-bottom: 0.25rem; }
+
+  /* ── ANIMATIONS ───────────────────────────────────────────────────────── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes bounce {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+    40%           { transform: scale(1);   opacity: 1; }
+  }
+
+  @media (max-width: 500px) {
+    main { padding: 0 0.75rem; }
+    .swipe-stack { height: 560px; }
+    header { padding: 0.7rem 1rem; }
   }
 </style>
 </head>
@@ -348,20 +389,15 @@
 
 <!-- ════════════════════════════════════════════════════════════════════════
      HEADER
-     Sticky top bar — logo plus tabs (tabs only visible after profile setup)
      ════════════════════════════════════════════════════════════════════════ -->
 <header>
-  <a class="logo" href="../../index.html">
-    <span class="locked">Locked</span><span class="in">in</span>
-  </a>
-
+  <a class="logo" href="../../index.html"><span class="locked">Locked</span><span class="in">in</span></a>
   <nav class="header-tabs" id="header-tabs">
     <button class="tab-btn active" data-tab="swipe">Discover</button>
     <button class="tab-btn" data-tab="matches">
       Matches <span class="badge" id="match-badge" style="display:none;">0</span>
     </button>
   </nav>
-
   <a class="back-link" href="../../index.html">← CubicleCreative</a>
 </header>
 
@@ -369,69 +405,47 @@
 
 <!-- ════════════════════════════════════════════════════════════════════════
      VIEW 1: LOGIN
-     Any name + password works — this is satire, not real auth
      ════════════════════════════════════════════════════════════════════════ -->
 <div id="view-login">
   <div class="form-card">
     <h1 class="form-title">Sign in to <span style="color:var(--linkedin);">Locked</span><span style="background:linear-gradient(135deg,var(--tinder),var(--tinder2));-webkit-background-clip:text;background-clip:text;color:transparent;">in</span></h1>
     <p class="form-sub">Where careers meet. Where ambition matches. Where your bio is your dating profile.</p>
     <form id="login-form">
-      <div class="form-group">
-        <label for="login-name">Name</label>
-        <input type="text" id="login-name" placeholder="Chad Synergy" required/>
-      </div>
-      <div class="form-group">
-        <label for="login-pass">Password</label>
-        <input type="password" id="login-pass" placeholder="••••••••" required/>
-      </div>
+      <div class="form-group"><label for="login-name">Name</label><input type="text" id="login-name" placeholder="Chad Synergy" required/></div>
+      <div class="form-group"><label for="login-pass">Password</label><input type="password" id="login-pass" placeholder="••••••••" required/></div>
       <button type="submit" class="btn-primary">Sign in</button>
     </form>
-    <p style="text-align:center; font-size:0.72rem; color:var(--muted); margin-top:1rem;">
-      Any credentials work. We're not actually checking.
-    </p>
+    <p style="text-align:center; font-size:0.72rem; color:var(--muted); margin-top:1rem;">Any credentials work. We're not actually checking.</p>
   </div>
 </div>
 
 <!-- ════════════════════════════════════════════════════════════════════════
      VIEW 2: PROFILE CREATION
-     User distributes 10 points across 5 traits, each capped at 5
      ════════════════════════════════════════════════════════════════════════ -->
 <div id="view-profile" style="display:none;">
   <div class="form-card">
     <h1 class="form-title">Build Your Profile</h1>
     <p class="form-sub">Distribute 10 points across 5 traits. Max 5 per trait. Choose carefully — these determine who's <em>really</em> in your league.</p>
-
-    <div class="points-banner">
-      Points remaining: <strong id="points-remaining">10</strong> / 10
-    </div>
-
-    <div id="stat-rows">
-      <!-- Generated by JS — see STAT_DEFS in <script> -->
-    </div>
-
-    <button class="btn-primary" id="btn-finish-profile" style="margin-top:1.4rem;" disabled>
-      Finish Profile →
-    </button>
+    <div class="points-banner">Points remaining: <strong id="points-remaining">10</strong> / 10</div>
+    <div id="stat-rows"></div>
+    <button class="btn-primary" id="btn-finish-profile" style="margin-top:1.4rem;" disabled>Finish Profile →</button>
   </div>
 </div>
 
 <!-- ════════════════════════════════════════════════════════════════════════
      VIEW 3: SWIPE FEED
-     Tinder-style card stack — tap card to cycle tabs, ✗/✓ buttons to swipe
      ════════════════════════════════════════════════════════════════════════ -->
 <div id="view-swipe" style="display:none;">
-  <div class="swipe-stack" id="swipe-stack">
-    <!-- Card injected by renderSwipeCard() -->
-  </div>
+  <div class="swipe-stack" id="swipe-stack"></div>
   <div class="swipe-actions">
     <button class="swipe-btn nope" id="btn-nope" title="Hard pass">✗</button>
     <button class="swipe-btn like" id="btn-like" title="Connect">✓</button>
   </div>
+  <div class="swipe-hint">Drag the card or use the buttons</div>
 </div>
 
 <!-- ════════════════════════════════════════════════════════════════════════
      VIEW 4: OUT OF SWIPES
-     Shown when all 10 profiles have been swiped
      ════════════════════════════════════════════════════════════════════════ -->
 <div id="view-empty" style="display:none;">
   <div class="empty-state">
@@ -442,17 +456,13 @@
 
 <!-- ════════════════════════════════════════════════════════════════════════
      VIEW 5: MATCHES LIST
-     Shown when "Matches" tab clicked — lists all matched profiles
      ════════════════════════════════════════════════════════════════════════ -->
 <div id="view-matches" style="display:none;">
-  <div id="match-list-container">
-    <!-- Populated by renderMatches() -->
-  </div>
+  <div id="match-list-container"></div>
 </div>
 
 <!-- ════════════════════════════════════════════════════════════════════════
-     VIEW 6: CHAT (placeholder)
-     Opens when a match is clicked — chat features TBD in next iteration
+     VIEW 6: CHAT
      ════════════════════════════════════════════════════════════════════════ -->
 <div id="view-chat" style="display:none;">
   <div class="chat-header">
@@ -463,20 +473,15 @@
       <div class="match-tagline" id="chat-tagline">—</div>
     </div>
   </div>
-  <div class="chat-body">
-    Chat features coming soon.<br/>You matched. That's enough for now.
-  </div>
-  <div class="chat-input-row">
-    <input type="text" placeholder="Message disabled — coming soon" disabled/>
-    <button disabled>Send</button>
-  </div>
+  <div class="chat-body" id="chat-body"></div>
+  <div class="chat-options" id="chat-options"></div>
+  <div class="chat-end-banner" id="chat-end" style="display:none;"></div>
 </div>
 
 </main>
 
 <!-- ════════════════════════════════════════════════════════════════════════
      MATCH MODAL
-     Full-screen overlay shown on a successful match
      ════════════════════════════════════════════════════════════════════════ -->
 <div class="modal-overlay" id="match-modal">
   <div class="modal-card">
@@ -489,17 +494,15 @@
 </div>
 
 <!-- ════════════════════════════════════════════════════════════════════════
-     SCRIPT — APPLICATION LOGIC
+     SCRIPT
      ════════════════════════════════════════════════════════════════════════ -->
 <script>
 (function(){
   'use strict';
 
   // ────────────────────────────────────────────────────────────────────────
-  // BLOCK 1: STATIC DATA — TRAITS
-  // Edit STAT_DEFS to rename or reorder the 5 traits
+  // BLOCK 1: TRAIT DEFINITIONS
   // ────────────────────────────────────────────────────────────────────────
-
   const STAT_DEFS = [
     { key: 'looks',      name: 'Looks',      desc: 'Filter game. Lighting. Genetics.' },
     { key: 'charisma',   name: 'Charisma',   desc: 'Smooth talker. Reads the room.' },
@@ -511,98 +514,419 @@
   const MAX_PER_STAT    = 5;
 
   // ────────────────────────────────────────────────────────────────────────
-  // BLOCK 2: STATIC DATA — FAKE PROFILES
-  // Add or edit profiles here. Each profile has:
-  //   - id, name, tagline, emoji (placeholder photo)
-  //   - bio, interests[], experience[{role, company, icon}]
-  //   - latestPost, comments[{author, text}]
-  //   - requirements: hidden trait thresholds for matching
+  // BLOCK 2: PROFILE DATA
+  // Each profile has expanded bio (prompt + facts), multiple posts, and a
+  // chat tree. To add new profiles, copy any block and update the fields.
+  //
+  // Chat tree structure:
+  //   chat: {
+  //     start: 'nodeId',
+  //     nodes: {
+  //       nodeId: {
+  //         npc: ["message1", "message2", ...],        // can be one or many bubbles
+  //         options: [
+  //           { text: "your reply", next: "nextId" },
+  //           { text: "alt reply", next: "anotherId" },
+  //         ],
+  //         end: 'success' | 'failed' | 'ghosted' | 'scammed'  // optional terminal
+  //       },
+  //       ...
+  //     }
+  //   }
+  //
+  // OUTCOMES: success = job offer. failed = rude rejection. ghosted = polite
+  // ghosting / waste of time. scammed = MLM/coaching pitch.
   // ────────────────────────────────────────────────────────────────────────
-
   const PROFILES = [
+
+    // ── 1. CHAD SYNERGY — Founder. Hireable but tests for grindset. ─────
     {
       id: 1, name: 'Chad Synergy', tagline: 'Vibe Engineer @ Stealth Startup', emoji: '💼',
       bio: "I don't just disrupt — I unlock paradigms. Currently building the Uber of breathing. Ex-McKinsey. INTJ. Goggins acolyte.",
+      prompt: { q: "I get unreasonably excited about", a: "people who reply to emails before 6am. The only acceptable hour to wake up is 4." },
+      funFacts: [
+        "I haven't taken a vacation in 7 years and I'm not bragging (I am)",
+        "My LinkedIn header is a photo of me at the gym",
+        "I have read 'The 4-Hour Workweek' and ignored every lesson",
+      ],
       interests: ['Cold Plunges','Founder Mode','Greek Stoicism','Carnivore Diet','5am Club'],
       experience: [
         { role: 'Vibe Engineer', company: 'Stealth (Series A — DM me)', icon: '🚀' },
         { role: 'Growth Lead',   company: 'A pre-revenue thing',         icon: '📈' },
         { role: 'Analyst',       company: 'McKinsey & Company',          icon: '🏢' },
       ],
-      latestPost: "Got rejected by 47 VCs today. Reframed it as 47 free pieces of feedback. The grindset is undefeated. 💪",
-      comments: [
-        { author: 'Karen Hustles', text: 'This is so true. So inspiring. Sharing with my team.' },
-        { author: 'Brad Optimizes', text: 'Massive. Mindset is everything.' },
+      posts: [
+        { time: '2h', text: "Got rejected by 47 VCs today. Reframed it as 47 free pieces of feedback. The grindset is undefeated. 💪",
+          likes: 1247, reposts: 89 },
+        { time: '1d', text: "Unpopular opinion: if you're not stressed, you're not growing.\n\nAt my last startup we worked Christmas morning and the team thanked me for it.\n\nI fired anyone who used PTO. Some called it 'illegal.' I called it culture.\n\nDM me if you want to be part of something special.",
+          likes: 3201, reposts: 412 },
+        { time: '3d', text: "My morning routine:\n\n4:15am — Wake up (no alarm, my body knows)\n4:20am — Cold plunge (33°F, 4 minutes)\n4:35am — 90 minutes of deep work before checking phone\n6:00am — Bone broth + creatine + Lion's Mane\n6:15am — Read 50 pages\n7:00am — Gym (push day)\n8:30am — First meeting\n\nThis is non-negotiable. Most people will never understand what it takes.",
+          likes: 5402, reposts: 731 },
       ],
-      requirements: { looks: 2, charisma: 4, smarts: 1, networking: 4, nepotism: 0 }
+      comments: [
+        { author: 'Karen Hustles',   text: 'This is so true. So inspiring. Sharing with my team.', neg: false },
+        { author: 'Brad Optimizes',  text: 'Massive. Mindset is everything.', neg: false },
+        { author: 'Anonymous Burner', text: 'Bro you are 24 and have never shipped a product', neg: true },
+        { author: 'Tracy Real',      text: 'My ex-boss talked exactly like this and the company collapsed.', neg: true },
+      ],
+      requirements: { looks: 2, charisma: 4, smarts: 1, networking: 4, nepotism: 0 },
+      chat: {
+        start: 'open',
+        nodes: {
+          open: {
+            npc: ["Hey 👋","Saw your profile. Ambition is undeniable.","What are you working on right now?"],
+            options: [
+              { text: "Looking for my next role, actually.", next: 'pitch' },
+              { text: "Just chilling honestly. Why?", next: 'instafail' },
+              { text: "I'm grinding on a side project at 5am every day.", next: 'allyin' },
+            ]
+          },
+          instafail: {
+            npc: ["Chilling.","Yeah I don't think this is going to work out."],
+            end: 'failed'
+          },
+          allyin: {
+            npc: ["YES. That's the energy I'm looking for.","Tell me about it. What's the vision?"],
+            options: [
+              { text: "It's a SaaS for productivity nerds.", next: 'offer' },
+              { text: "Honestly it's mostly an excuse to stay busy.", next: 'instafail' },
+            ]
+          },
+          pitch: {
+            npc: ["Perfect timing.","I'm hiring a 'Founding Vibes Engineer' — equity-only, 80hr weeks, no PTO for the first two years.","Are you the type who would die for the mission?"],
+            options: [
+              { text: "Absolutely. Where do I sign?", next: 'offer' },
+              { text: "Equity-only? I have rent.", next: 'reject_money' },
+              { text: "Tell me about benefits first.", next: 'reject_benefits' },
+            ]
+          },
+          reject_money: {
+            npc: ["If you're thinking about money you're not founder material.","Pass."],
+            end: 'failed'
+          },
+          reject_benefits: {
+            npc: ["Benefits? The benefit is the journey.","I think we want different things."],
+            end: 'ghosted'
+          },
+          offer: {
+            npc: ["I knew you were the one.","Sending you the offer letter now. We start Monday at 5am sharp.","Welcome to the team."],
+            end: 'success'
+          },
+        }
+      }
     },
+
+    // ── 2. TIFFANY QUARTZ — MLM. Will try to sell you a course. ─────────
     {
       id: 2, name: 'Tiffany Quartz', tagline: 'Wellness Architect ✨ Manifesting CEO', emoji: '🧘',
       bio: "I help high-vibe women monetize their feminine energy. 7-figure mindset coach. My morning routine is 4 hours long and you should ask about it.",
+      prompt: { q: "The way to win me over", a: "tell me you're 'ready to invest in yourself' (in my $8K course)" },
+      funFacts: [
+        "I have never had a real job",
+        "My income screenshots are from one really good month in 2022",
+        "I have crystals on my desk for 'energetic alignment' (and TikTok)",
+      ],
       interests: ['Manifestation','Hot Yoga','Almond Lattes','Crystals','Personal Branding'],
       experience: [
         { role: 'Founder & CVO',     company: 'Quartz Wellness Co.',  icon: '🌸' },
         { role: 'Lifestyle Curator', company: 'Self-employed',         icon: '✨' },
         { role: 'Brand Ambassador',  company: 'Several MLMs',          icon: '💎' },
       ],
-      latestPost: "Just launched my new course: 'Manifest Your First $10K Month (Even If You're Lazy).' Link in bio. The universe rewards action. 🌟",
-      comments: [
-        { author: 'Jenny Aligned', text: 'OBSESSED with your energy 😍😍' },
-        { author: 'Madison Glow', text: 'You inspire me daily. Joining now!' },
+      posts: [
+        { time: '4h', text: "Just launched my new course: 'Manifest Your First $10K Month (Even If You're Lazy).' Link in bio. The universe rewards action. 🌟",
+          likes: 891, reposts: 124 },
+        { time: '2d', text: "Babe, I'm going to be honest with you.\n\nIf you're still trading hours for dollars in 2024, you're choosing scarcity.\n\nI used to be like you. Stuck in a 9-5 (for 6 weeks before I quit). Then I invested in MYSELF.\n\nI made my first $1,000 in passive income within 3 months (not counting the $8K I spent on the course that taught me).\n\nReady to break free? My DMs are open. (Application required. Investment starts at $4,997.)",
+          likes: 2104, reposts: 356 },
+        { time: '5d', text: "Reminder: your bank account is just a reflection of your beliefs.\n\nIf you don't have money, it's because you're blocking abundance. Not because of capitalism, inflation, or your circumstances.\n\nDo the work. Heal your relationship with money. Then DM me about my mastermind. ✨",
+          likes: 1567, reposts: 203 },
       ],
-      requirements: { looks: 5, charisma: 3, smarts: 0, networking: 2, nepotism: 0 }
+      comments: [
+        { author: 'Jenny Aligned', text: 'OBSESSED with your energy 😍😍', neg: false },
+        { author: 'Madison Glow',  text: 'You inspire me daily. Joining now!', neg: false },
+        { author: 'Sarah Skeptic', text: 'This is just an MLM with extra steps.', neg: true },
+        { author: 'Former Client', text: 'I spent $8K on her course. Got a PDF and a Slack invite.', neg: true },
+      ],
+      requirements: { looks: 5, charisma: 3, smarts: 0, networking: 2, nepotism: 0 },
+      chat: {
+        start: 'open',
+        nodes: {
+          open: {
+            npc: ["Hi babe! ✨","I felt called to message you — your energy is SO aligned.","Tell me, what's blocking you right now?"],
+            options: [
+              { text: "I'm just looking for a job, honestly.", next: 'pivot1' },
+              { text: "Nothing really? I'm doing fine.", next: 'pivot2' },
+              { text: "Wait, are you trying to sell me something?", next: 'pivot3' },
+            ]
+          },
+          pivot1: {
+            npc: ["A 'job'? Babe.","What if I told you you'll never be free working for someone else?","I have an opportunity that changed my life. Want to hear about it?"],
+            options: [
+              { text: "Sure, I'm curious.", next: 'pitch' },
+              { text: "If you're hiring, yes. Otherwise no.", next: 'pitch' },
+              { text: "I'd rather just have a normal job.", next: 'reject_normie' },
+            ]
+          },
+          pivot2: {
+            npc: ["Doing fine?","Babe, 'fine' is the enemy of greatness.","Most people settle. I help women UNLEASH. Want in?"],
+            options: [
+              { text: "Tell me more.", next: 'pitch' },
+              { text: "I'm good, thanks.", next: 'reject_normie' },
+            ]
+          },
+          pivot3: {
+            npc: ["I'm not 'selling' anything 💕","I'm offering you an opportunity to invest in yourself.","Most people can't see the difference. Can you?"],
+            options: [
+              { text: "...go on.", next: 'pitch' },
+              { text: "Yeah this is just an MLM. Bye.", next: 'reject_callout' },
+            ]
+          },
+          reject_normie: {
+            npc: ["I love that for you 🥰","Manifesting big things for your little life ✨"],
+            end: 'ghosted'
+          },
+          reject_callout: {
+            npc: ["You're not ready. The universe will bring you back when you are. 🙏","BLOCKED."],
+            end: 'failed'
+          },
+          pitch: {
+            npc: ["My signature program 'Quartz Queens' is opening enrollment 💎","It's a 12-week container for high-frequency women ready to scale.","The investment is $8,997 — payment plans available.","Ready to claim your spot?"],
+            options: [
+              { text: "Wait — this isn't a job offer?", next: 'finalpitch' },
+              { text: "Sign me up I guess?", next: 'scammed' },
+              { text: "Hard pass.", next: 'reject_callout' },
+            ]
+          },
+          finalpitch: {
+            npc: ["A 'job' would CAP your earning potential, babe.","With my program you become your own boss. (And recruit other women into the program.)","Last chance. In or out?"],
+            options: [
+              { text: "I'll take it.", next: 'scammed' },
+              { text: "Out. Definitely out.", next: 'reject_callout' },
+            ]
+          },
+          scammed: {
+            npc: ["AHHH YAY!! 💕✨","Sending you the contract now. Non-refundable.","Welcome to the Quartz family! (You're now expected to recruit 3 more women within 30 days.)"],
+            end: 'scammed'
+          },
+        }
+      }
     },
+
+    // ── 3. TRENT MAXIMILIAN III — Trust fund. Ghosts you for being poor. ─
     {
       id: 3, name: 'Trent Maximilian III', tagline: 'Strategic Investor • Family Office', emoji: '🎩',
       bio: "Third-generation investor. Father owns the building you work in. I like sailing, polo, and 'finding myself' between trust fund disbursements.",
+      prompt: { q: "My most controversial opinion", a: "rent control is theft and so is paying for my own meals" },
+      funFacts: [
+        "I went to Wharton because dad made a building",
+        "I have never used public transit",
+        "I once 'started a company' that was just my dad's accountant rebranded",
+      ],
       interests: ['Polo','Yachting','Vintage Watches','Aspen','Sotheby\'s Auctions'],
       experience: [
-        { role: 'Principal',       company: 'Maximilian Family Office',     icon: '🏛️' },
-        { role: 'Board Member',    company: 'Three companies dad bought',   icon: '👔' },
-        { role: 'Summer Analyst',  company: 'Goldman Sachs (his uncle\'s desk)', icon: '💰' },
+        { role: 'Principal',       company: 'Maximilian Family Office',           icon: '🏛️' },
+        { role: 'Board Member',    company: 'Three companies dad bought',          icon: '👔' },
+        { role: 'Summer Analyst',  company: 'Goldman Sachs (his uncle\'s desk)',   icon: '💰' },
       ],
-      latestPost: "Reflecting on my journey today. Started from the bottom (Wharton) and through hard work and grit (and a $10M seed loan from family) built something real.",
+      posts: [
+        { time: '1d', text: "Reflecting on my journey today. Started from the bottom (Wharton) and through hard work and grit (and a $10M seed loan from family) built something real.\n\nIt wasn't easy. There were many lunches at the country club where I had to make difficult decisions about which bottle of wine to order.\n\nGrateful for the haters who said I'd never make it (no one ever said this).",
+          likes: 412, reposts: 23 },
+        { time: '4d', text: "Took the family yacht out this weekend. Sometimes you need to disconnect to reconnect with what matters: networking with other yacht owners.",
+          likes: 187, reposts: 8 },
+      ],
       comments: [
-        { author: 'Alistair Wellington', text: 'Inspiring story Trent. Lunch at the club Thursday?' },
-        { author: 'Buffy Hampton', text: 'So humble. So self-made.' },
+        { author: 'Alistair Wellington', text: 'Inspiring story Trent. Lunch at the club Thursday?', neg: false },
+        { author: 'Buffy Hampton',       text: 'So humble. So self-made.', neg: false },
+        { author: 'Jake Working',        text: 'Bro you literally inherited everything', neg: true },
       ],
-      requirements: { looks: 2, charisma: 1, smarts: 1, networking: 3, nepotism: 5 }
+      requirements: { looks: 2, charisma: 1, smarts: 1, networking: 3, nepotism: 5 },
+      chat: {
+        start: 'open',
+        nodes: {
+          open: {
+            npc: ["Hello.","Where did you go to university?"],
+            options: [
+              { text: "Harvard.", next: 'pedigree' },
+              { text: "State school. Why?", next: 'classist' },
+              { text: "I didn't.", next: 'classist' },
+            ]
+          },
+          pedigree: {
+            npc: ["Ah. Acceptable.","Who's your father?"],
+            options: [
+              { text: "Just a regular guy.", next: 'classist' },
+              { text: "He owns a small business.", next: 'classist' },
+              { text: "He's on the board of [important sounding place].", next: 'inside' },
+            ]
+          },
+          classist: {
+            npc: ["I see.","Listen, I think there's been a misunderstanding.","I don't really do this with… your sort.","Best of luck."],
+            end: 'ghosted'
+          },
+          inside: {
+            npc: ["Oh splendid! Small world.","I'm always looking for the right kind of people for our portfolio companies.","Lunch at the club Thursday? I'll have my assistant arrange it."],
+            options: [
+              { text: "Thursday works.", next: 'offer' },
+              { text: "Can we do a video call instead?", next: 'classist' },
+            ]
+          },
+          offer: {
+            npc: ["Excellent. We'll find a place for you.","Title to be determined. Compensation will be 'competitive.' Don't ask what that means."],
+            end: 'success'
+          },
+        }
+      }
     },
+
+    // ── 4. DR. AARON PATEL-GOLDSTEIN — Pseudo-intellectual. Time-waster. ─
     {
       id: 4, name: 'Dr. Aaron Patel-Goldstein', tagline: 'PhD, MD, MBA, JD • Dad', emoji: '🤓',
       bio: "Quadruple-degreed polymath. I will explain blockchain to you uninvited. I have 4 podcasts. None of my coworkers like me but I'm certain that's their problem.",
+      prompt: { q: "I want to know your thoughts on", a: "the simulation hypothesis (I will not respect any answer)" },
+      funFacts: [
+        "I correct grammar in DMs",
+        "I have a Substack 17 people subscribe to",
+        "I once told my boss he was 'philosophically wrong' in a 1:1",
+      ],
       interests: ['Rationalism','Effective Altruism','Lex Fridman','Chess','Ergonomic Keyboards'],
       experience: [
         { role: 'Research Fellow',   company: 'Institute You Haven\'t Heard Of', icon: '🔬' },
         { role: 'Visiting Lecturer', company: 'Stanford (one guest seminar)',  icon: '🎓' },
         { role: 'Co-author',         company: '47 papers, 0 citations',         icon: '📚' },
       ],
-      latestPost: "Hot take: most people aren't reading enough. I read 3 books a week. Currently re-reading Sapiens for the 8th time. Ask me anything.",
-      comments: [
-        { author: 'Jason Optimal', text: 'What\'s your stance on the Fermi paradox?' },
-        { author: 'Dr. Aaron Patel-Goldstein', text: '@Jason great question, I\'ve written extensively on this in my Substack.' },
+      posts: [
+        { time: '6h', text: "Hot take: most people aren't reading enough.\n\nI read 3 books a week. Currently re-reading Sapiens for the 8th time. The first 7 readings, I felt I was missing something. Now I'm certain everyone else is.\n\nAsk me anything.",
+          likes: 87, reposts: 4 },
+        { time: '2d', text: "Wrote a 9,400-word essay on why most management theory is intellectually bankrupt.\n\nNo one at my company has read it.\n\nThis says more about them than me.",
+          likes: 32, reposts: 1 },
       ],
-      requirements: { looks: 0, charisma: 1, smarts: 5, networking: 1, nepotism: 0 }
+      comments: [
+        { author: 'Jason Optimal',  text: "What's your stance on the Fermi paradox?", neg: false },
+        { author: 'Dr. Aaron Patel-Goldstein', text: '@Jason great question, I\'ve written extensively on this in my Substack.', neg: false },
+        { author: 'Rachel Real',    text: 'You have been at this company 6 years and never been promoted. Maybe think about why.', neg: true },
+      ],
+      requirements: { looks: 0, charisma: 1, smarts: 5, networking: 1, nepotism: 0 },
+      chat: {
+        start: 'open',
+        nodes: {
+          open: {
+            npc: ["Hello.","Before we continue, I need to assess intellectual compatibility.","What's your take on the trolley problem?"],
+            options: [
+              { text: "Pull the lever. One vs five. Easy.", next: 'shallow' },
+              { text: "It depends on the variant. The Foot version is more interesting.", next: 'deeper' },
+              { text: "Honestly, I just want to know if you're hiring.", next: 'rude' },
+            ]
+          },
+          rude: {
+            npc: ["Fascinating that you reduced this to transactions.","I'm not sure we're an intellectual match."],
+            end: 'failed'
+          },
+          shallow: {
+            npc: ["Hmm. Surface-level.","Have you read Parfit?"],
+            options: [
+              { text: "No, but I'd like to.", next: 'lecture' },
+              { text: "Yes, actually.", next: 'deeper' },
+              { text: "Look, are we talking about jobs or not?", next: 'rude' },
+            ]
+          },
+          deeper: {
+            npc: ["Interesting.","You may be one of the few I can have a real conversation with.","I should send you my essay. It's 14,000 words."],
+            options: [
+              { text: "Sure, send it over.", next: 'lecture' },
+              { text: "Can we talk about the role first?", next: 'rude' },
+            ]
+          },
+          lecture: {
+            npc: ["Sent. Three more on the way.","Also a podcast episode and my forthcoming book draft.","Read these and we'll reconvene next month."],
+            options: [
+              { text: "Next month? I needed a job soon.", next: 'rude' },
+              { text: "OK, I'll get on it.", next: 'forever' },
+            ]
+          },
+          forever: {
+            npc: ["Excellent.","I'll follow up… eventually.","(He never follows up.)"],
+            end: 'ghosted'
+          },
+        }
+      }
     },
+
+    // ── 5. BRITTANY PEAK — Influencer. Sensitive. Easy to offend. ───────
     {
       id: 5, name: 'Brittany Peak', tagline: 'Content Creator • 2.4M followers', emoji: '🤳',
       bio: "Day in my life: gym → green juice → photoshoot → cry → repeat. Brand collabs: brittany@socialhouse.co. My therapist is also my publicist.",
+      prompt: { q: "A non-negotiable for me is", a: "you can't be uglier than me in photos. It throws off my grid." },
+      funFacts: [
+        "I have cried on camera 47 times this year (12 were genuine)",
+        "I bought my followers in 2019 and now they're real",
+        "I've been canceled three times and called it 'growth'",
+      ],
       interests: ['Pilates','Brand Deals','Self-Care Sundays','Mukbangs','PR Boxes'],
       experience: [
-        { role: 'Content Creator', company: 'Self-employed',     icon: '📱' },
-        { role: 'Brand Partner',   company: 'Skims, Sephora',     icon: '💄' },
-        { role: 'Influencer',      company: 'Instagram',          icon: '✨' },
+        { role: 'Content Creator', company: 'Self-employed', icon: '📱' },
+        { role: 'Brand Partner',   company: 'Skims, Sephora', icon: '💄' },
+        { role: 'Influencer',      company: 'Instagram',      icon: '✨' },
       ],
-      latestPost: "Get ready with me to read mean comments about myself! Spoiler: I cry in a Range Rover. Linked the lipgloss in my bio. 💋",
+      posts: [
+        { time: '1h', text: "Get ready with me to read mean comments about myself! Spoiler: I cry in a Range Rover. Linked the lipgloss in my bio. 💋",
+          likes: 41203, reposts: 1842 },
+        { time: '3d', text: "Being a creator is HARD.\n\nPeople don't understand the pressure of staying relevant. The constant comparison. The 4am photoshoots. The brand deal rejections.\n\nLast week I cried for 11 hours straight because a brand only offered me $40K for one post.\n\nBeing pretty is a full-time job and I deserve grace. 💔",
+          likes: 18904, reposts: 502 },
+      ],
       comments: [
-        { author: 'fan_account_142', text: 'QUEEN. ICON. LEGEND.' },
-        { author: 'Beauty Brand Co.', text: 'DM\'d you about a collab! 💌' },
+        { author: 'fan_account_142',   text: 'QUEEN. ICON. LEGEND.', neg: false },
+        { author: 'Beauty Brand Co.',  text: "DM'd you about a collab! 💌", neg: false },
+        { author: 'Nicole Reality',    text: 'Bestie you got paid $40k to take ONE photo', neg: true },
       ],
-      requirements: { looks: 5, charisma: 4, smarts: 0, networking: 1, nepotism: 0 }
+      requirements: { looks: 5, charisma: 4, smarts: 0, networking: 1, nepotism: 0 },
+      chat: {
+        start: 'open',
+        nodes: {
+          open: {
+            npc: ["Hiii 💕","OMG sorry just got out of a brand meeting","So like — what do you think of my content?"],
+            options: [
+              { text: "It's amazing! You're so authentic.", next: 'flattered' },
+              { text: "I haven't really seen much, honestly.", next: 'offended' },
+              { text: "Bit much, no?", next: 'instakill' },
+            ]
+          },
+          instakill: {
+            npc: ["…","I'm literally crying right now.","BLOCKED."],
+            end: 'failed'
+          },
+          offended: {
+            npc: ["You haven't SEEN my content?","I have 2.4M followers babe.","I'm not sure this is going to work."],
+            end: 'ghosted'
+          },
+          flattered: {
+            npc: ["OMG you GET it 🥹","I'm actually hiring an assistant. Are you available 24/7?","Pay is exposure but you'd get to be in some of my content. (Background only.)"],
+            options: [
+              { text: "Sounds amazing! Yes!", next: 'offer_unpaid' },
+              { text: "Is there actual money involved?", next: 'no_money' },
+              { text: "I'd need a real salary.", next: 'no_money' },
+            ]
+          },
+          no_money: {
+            npc: ["Money? Babe. EXPOSURE.","People would KILL to be in my orbit.","I think you're not visionary enough for this."],
+            end: 'ghosted'
+          },
+          offer_unpaid: {
+            npc: ["YES. I knew you got it.","Sending you the NDA now. You'll need to be available weekends, evenings, and holidays.","Welcome to Team Brittany 💖"],
+            end: 'success'
+          },
+        }
+      }
     },
+
+    // ── 6. MARCUS IRON — Workaholic. Hires anyone. Run. ─────────────────
     {
       id: 6, name: 'Marcus Iron', tagline: 'Workaholic • Sleep is for the weak', emoji: '☕',
       bio: "100-hour weeks. 4 hours of sleep. I haven't seen my kids in 6 months but I'm crushing my OKRs. Ask me about my Notion stack.",
+      prompt: { q: "You should leave if", a: "you check out at 5pm or use the phrase 'work-life balance' unironically" },
+      funFacts: [
+        "I email at 3am to keep my team 'sharp'",
+        "My 'PTO' last year was a Zoom call from a hospital",
+        "My wedding ring is somewhere on my desk",
+      ],
       interests: ['Productivity','Cold Brew','Notion','Deep Work','Quitting Slack at 11pm'],
       experience: [
         { role: 'Senior Director', company: 'BigCorp Inc.',           icon: '🏢' },
@@ -610,112 +934,344 @@
         { role: 'Manager',         company: 'BigCorp Inc.',           icon: '🏢' },
         { role: 'Analyst',         company: 'BigCorp Inc. (8 yrs)',   icon: '🏢' },
       ],
-      latestPost: "Worked through Christmas. Wife hasn't spoken to me since. But shipped the Q4 deck. Worth it. 🚀 Who else is grinding?",
-      comments: [
-        { author: 'Greg Burnout', text: 'Same brother. Get it.' },
-        { author: 'Rachel HR', text: 'Marcus, please use your PTO. — HR' },
+      posts: [
+        { time: '5h', text: "Worked through Christmas. Wife hasn't spoken to me since. But shipped the Q4 deck. Worth it. 🚀 Who else is grinding?",
+          likes: 524, reposts: 78 },
+        { time: '2d', text: "I sleep 4 hours a night and you're not going to outwork me. Ever.\n\nMy team Slacks me at midnight and they BETTER respond. If you 'have boundaries' you should work somewhere else. Like a library.",
+          likes: 1102, reposts: 134 },
       ],
-      requirements: { looks: 1, charisma: 2, smarts: 3, networking: 3, nepotism: 1 }
+      comments: [
+        { author: 'Greg Burnout',  text: 'Same brother. Get it.', neg: false },
+        { author: 'Rachel HR',     text: 'Marcus, please use your PTO. — HR', neg: true },
+        { author: 'His Wife',      text: 'Marcus come home.', neg: true },
+      ],
+      requirements: { looks: 1, charisma: 2, smarts: 3, networking: 3, nepotism: 1 },
+      chat: {
+        start: 'open',
+        nodes: {
+          open: {
+            npc: ["You up? It's 11:47pm.","Good. That's already a green flag.","I'm hiring. Are you available for a 'quick call'? (90 minutes minimum.)"],
+            options: [
+              { text: "Sure, when works?", next: 'now' },
+              { text: "It's late, can we do tomorrow?", next: 'late' },
+              { text: "What's the role?", next: 'role' },
+            ]
+          },
+          late: {
+            npc: ["'Late.'","If we're not aligned on availability, this won't work."],
+            end: 'failed'
+          },
+          now: {
+            npc: ["Sending invite for midnight tonight.","Be there. Camera on."],
+            options: [
+              { text: "Done.", next: 'offer' },
+              { text: "Wait, what's the role?", next: 'role' },
+            ]
+          },
+          role: {
+            npc: ["Senior Project Catalyst.","60-80 hours expected. Salary 'competitive.' Don't ask.","Are you in?"],
+            options: [
+              { text: "I'm in.", next: 'offer' },
+              { text: "What's the salary actually?", next: 'failed_salary' },
+              { text: "60-80 hours? No thanks.", next: 'failed_salary' },
+            ]
+          },
+          failed_salary: {
+            npc: ["If you have to ask about money you're not the one.","Next."],
+            end: 'failed'
+          },
+          offer: {
+            npc: ["YES.","Offer letter in your inbox. We start tonight.","Sleep is optional. Welcome to Iron's team."],
+            end: 'success'
+          },
+        }
+      }
     },
+
+    // ── 7. ZOE AUTHENTIC — Coach. MLM-adjacent. ─────────────────────────
     {
       id: 7, name: 'Zoe Authentic', tagline: 'Founder • Coach • Speaker • Author', emoji: '🌿',
       bio: "I left my 6-figure consulting job to find myself in Bali. Now I help others find themselves (for $8K). Author of 'Unburdened.' My dog has a verified account.",
+      prompt: { q: "We'll get along if you", a: "can pretend my husband's salary doesn't exist" },
+      funFacts: [
+        "My 'business' is funded by my husband's job at McKinsey",
+        "I haven't paid for a meal since 2019 (always 'business expense')",
+        "My book has 12 reviews. 11 are from family.",
+      ],
       interests: ['Sound Baths','Plant Medicine','Journaling','Bali','My Truth'],
       experience: [
         { role: 'Founder',  company: 'Authentic AF Coaching',  icon: '🌺' },
         { role: 'Author',   company: 'Self-published',          icon: '📖' },
         { role: 'Ex-McK',   company: 'Won\'t shut up about it', icon: '🥥' },
       ],
-      latestPost: "I quit my soul-crushing job and now make 10x as a coach. If I can do it, you can too! (Disclaimer: I had $200K saved and a husband with a job.)",
-      comments: [
-        { author: 'Lily Awakened', text: 'You\'re my role model 🙏' },
-        { author: 'Random Stranger', text: 'How do you afford rent?' },
+      posts: [
+        { time: '6h', text: "I quit my soul-crushing job and now make 10x as a coach.\n\nIf I can do it, you can too!\n\n(Disclaimer in 8pt font: I had $200K saved, a husband with a job, and family money. But forget that part.)",
+          likes: 2204, reposts: 318 },
       ],
-      requirements: { looks: 3, charisma: 3, smarts: 1, networking: 3, nepotism: 0 }
+      comments: [
+        { author: 'Lily Awakened',     text: "You're my role model 🙏", neg: false },
+        { author: 'Random Stranger',   text: 'How do you afford rent?', neg: true },
+        { author: 'Her Sister',        text: "Mom's still paying for your gym membership Zoe.", neg: true },
+      ],
+      requirements: { looks: 3, charisma: 3, smarts: 1, networking: 3, nepotism: 0 },
+      chat: {
+        start: 'open',
+        nodes: {
+          open: {
+            npc: ["Hi soul ✨","I'm picking up some really aligned energy from you.","Are you ready to step into your power?"],
+            options: [
+              { text: "I'm just looking for a job actually.", next: 'pivot' },
+              { text: "Sure, what does that mean?", next: 'pivot' },
+              { text: "I think this is a sales pitch.", next: 'reject' },
+            ]
+          },
+          reject: {
+            npc: ["I love that for you. Truly.","Not everyone is ready for transformation. 🌸"],
+            end: 'ghosted'
+          },
+          pivot: {
+            npc: ["I run a 6-month container called 'Awaken Your Worth.'","It's $6,500. Or $7,500 with the Bali retreat.","Most of my clients double their income within 90 days. (Anecdotally. No data.)"],
+            options: [
+              { text: "Interesting, tell me more.", next: 'pitch2' },
+              { text: "That's a lot of money for a Zoom call.", next: 'reject' },
+            ]
+          },
+          pitch2: {
+            npc: ["The investment is the entry fee for the woman you're becoming.","Are you in?"],
+            options: [
+              { text: "I'm in.", next: 'scammed' },
+              { text: "Let me think about it.", next: 'pressure' },
+            ]
+          },
+          pressure: {
+            npc: ["The next cohort fills today.","If you're hesitating, you're not ready. ✨","No pressure but also: this exact moment is your sign."],
+            options: [
+              { text: "Fine, I'll do it.", next: 'scammed' },
+              { text: "Actually no.", next: 'reject' },
+            ]
+          },
+          scammed: {
+            npc: ["YES! 🌸","Sending the contract. Non-refundable. No guarantees of outcome.","Welcome to the most expensive group chat of your life."],
+            end: 'scammed'
+          },
+        }
+      }
     },
+
+    // ── 8. KADEN CHIP — AI bro. Fake startup. Time-waster. ──────────────
     {
       id: 8, name: 'Kaden Chip', tagline: 'AI Whisperer 🤖 ex-OpenAI (intern)', emoji: '🧠',
       bio: "I don't write code, I prompt orchestrate. Built 12 SaaS products this month with no users. AGI is 6 months away. Trust me bro.",
+      prompt: { q: "Two truths and a lie", a: "1. I built 12 startups. 2. None of them work. 3. AGI is 6 months away. (One of these is a lie, you decide.)" },
+      funFacts: [
+        "My 'startup' is a ChatGPT wrapper",
+        "I have 47 GitHub repos and 0 stars total",
+        "I tweet about 'shipping' more than I ship",
+      ],
       interests: ['Prompt Engineering','Vibecoding','Twitter Threads','Hackathons','AGI Doomerism'],
       experience: [
         { role: 'Founder',         company: 'Yet Another AI Wrapper',   icon: '🤖' },
         { role: 'Indie Hacker',    company: 'Self (12 projects, 0 MRR)', icon: '💻' },
         { role: 'Summer Intern',   company: 'OpenAI (cafeteria)',        icon: '☕' },
       ],
-      latestPost: "Day 47 of #buildinpublic. MRR: $0. Users: 0. Twitter followers: +3. We're so back. The dip is part of the journey. 🚀",
-      comments: [
-        { author: 'GrindHard_Pete', text: 'Keep cooking king' },
-        { author: 'AI Bro Daily', text: 'Featuring you in my newsletter!' },
+      posts: [
+        { time: '3h', text: "Day 47 of #buildinpublic.\n\nMRR: $0\nUsers: 0\nTwitter followers: +3\n\nWe're so back. The dip is part of the journey. 🚀",
+          likes: 89, reposts: 12 },
+        { time: '5d', text: "AGI in 6 months. Mark this post.\n\n(I will delete this in 6 months when I'm wrong.)",
+          likes: 234, reposts: 45 },
       ],
-      requirements: { looks: 1, charisma: 2, smarts: 4, networking: 2, nepotism: 1 }
+      comments: [
+        { author: 'GrindHard_Pete', text: 'Keep cooking king', neg: false },
+        { author: 'AI Bro Daily',   text: 'Featuring you in my newsletter!', neg: false },
+        { author: 'Sarah Eng',      text: 'Bro you have no users. None.', neg: true },
+      ],
+      requirements: { looks: 1, charisma: 2, smarts: 4, networking: 2, nepotism: 1 },
+      chat: {
+        start: 'open',
+        nodes: {
+          open: {
+            npc: ["yo","what's your stack","actually nm — just tell me: bullish or bearish on AGI"],
+            options: [
+              { text: "Bullish. Obviously.", next: 'maybe' },
+              { text: "Bearish. It's overhyped.", next: 'reject' },
+              { text: "I just want a job.", next: 'reject' },
+            ]
+          },
+          reject: {
+            npc: ["damn ok","you're not ready for what's coming","gl tho 🫡"],
+            end: 'ghosted'
+          },
+          maybe: {
+            npc: ["respect","I might have something for you","I'm hiring 'Founding AI Engineers' (5 of them, equity only)","you'd be co-founder #6"],
+            options: [
+              { text: "How much equity?", next: 'equity' },
+              { text: "Sounds amazing!", next: 'string' },
+              { text: "Equity-only? No.", next: 'reject' },
+            ]
+          },
+          equity: {
+            npc: ["0.05%","but it's a 'pre-seed unicorn'","trust me bro"],
+            options: [
+              { text: "I'm in.", next: 'string' },
+              { text: "0.05%? That's nothing.", next: 'reject' },
+            ]
+          },
+          string: {
+            npc: ["LFG","sending you the Notion","actually one sec, on a call","actually two secs, my cofounder needs me","brb 🫡","(he never came back)"],
+            end: 'ghosted'
+          },
+        }
+      }
     },
+
+    // ── 9. MARGARET PEARCE-WHITLEY — Networker. Actually helpful. ───────
     {
       id: 9, name: 'Margaret Pearce-Whitley', tagline: 'Networking Powerhouse • Connector', emoji: '🦋',
       bio: "I know everyone. Quite literally everyone. If you need an intro, I'm your person. I've attended 312 networking events this year. I do not work.",
+      prompt: { q: "An ideal first meeting is", a: "you, me, and four other strangers I've also asked to coffee this week" },
+      funFacts: [
+        "I have 30,000 LinkedIn connections and remember 4 of them",
+        "I once introduced myself to someone twice in one event",
+        "My calendar is mostly other people's calendars",
+      ],
       interests: ['Networking Events','LinkedIn DMs','Conferences','Coffee Chats','Name Dropping'],
       experience: [
         { role: 'Connector',         company: 'The Network',                  icon: '🌐' },
         { role: 'Community Builder', company: 'Several Slack groups',         icon: '💬' },
         { role: 'Event Host',        company: 'My own LinkedIn Lives',        icon: '🎤' },
       ],
-      latestPost: "Just hit 30,000 LinkedIn connections! Slid into a CEO's DMs and now we're 'in talks.' Reminder: your network is your net worth. ✨",
-      comments: [
-        { author: 'Connection #29,847', text: 'Congrats Margaret!' },
-        { author: 'Bob Networker', text: 'How do I get on your calendar?' },
+      posts: [
+        { time: '2h', text: "Just hit 30,000 LinkedIn connections!\n\nSlid into a CEO's DMs and now we're 'in talks.' Reminder: your network is your net worth. ✨\n\n(Note: I do not actually have a job.)",
+          likes: 3402, reposts: 489 },
       ],
-      requirements: { looks: 2, charisma: 3, smarts: 1, networking: 5, nepotism: 1 }
+      comments: [
+        { author: 'Connection #29,847', text: 'Congrats Margaret!', neg: false },
+        { author: 'Bob Networker',      text: 'How do I get on your calendar?', neg: false },
+        { author: 'Real Person',        text: "Margaret what is your actual job", neg: true },
+      ],
+      requirements: { looks: 2, charisma: 3, smarts: 1, networking: 5, nepotism: 1 },
+      chat: {
+        start: 'open',
+        nodes: {
+          open: {
+            npc: ["Darling! 💕","I just KNOW we're meant to connect.","Tell me — what kind of role are you looking for?"],
+            options: [
+              { text: "Honestly anything in marketing.", next: 'helpful' },
+              { text: "I'm not sure yet.", next: 'helpful' },
+              { text: "Are you actually hiring?", next: 'honest' },
+            ]
+          },
+          honest: {
+            npc: ["Hiring? No darling, I don't have a job.","But I know everyone who does! 💕","Want me to introduce you to someone?"],
+            options: [
+              { text: "Yes please!", next: 'helpful' },
+              { text: "I was kind of hoping for a direct opportunity…", next: 'fizzle' },
+            ]
+          },
+          fizzle: {
+            npc: ["Aw babe — direct opportunities are SO old-fashioned.","Networking is the way. Let me know if you change your mind! 💕"],
+            end: 'ghosted'
+          },
+          helpful: {
+            npc: ["I have just the person.","Sarah at Acme Corp owes me a favor.","Sending an intro now! Don't ghost me on the followup."],
+            options: [
+              { text: "Thank you so much!", next: 'success_intro' },
+              { text: "Wait, should I be worried?", next: 'success_intro' },
+            ]
+          },
+          success_intro: {
+            npc: ["Done! Email sent. CC'd you both. ✨","She'll reach out within a week.","(She actually did. Margaret came through.)"],
+            end: 'success'
+          },
+        }
+      }
     },
+
+    // ── 10. DEVON TRUSTFUND — Trust fund artist. Pure waste of time. ────
     {
       id: 10, name: 'Devon Trustfund', tagline: 'Photographer / DJ / Founder / Free Spirit', emoji: '📷',
       bio: "Living off my dad's investments while I 'figure things out.' Currently shooting film in Lisbon. My art is funded by inherited wealth I won't acknowledge.",
+      prompt: { q: "I geek out about", a: "telling people I 'don't believe in capitalism' from my $4M Lisbon apartment" },
+      funFacts: [
+        "I have 7 Leicas. Have not sold a single print.",
+        "I once said I 'don't really do money'",
+        "My 'startup' was a $30K Shopify drop with one t-shirt",
+      ],
       interests: ['Film Photography','Vinyl','Lisbon','Slow Living','Not Working'],
       experience: [
         { role: 'Photographer',  company: 'Self (unbooked)',            icon: '📸' },
         { role: 'DJ',            company: 'Friends\' parties',          icon: '🎧' },
         { role: 'Founder',       company: 'A clothing brand (1 drop)',  icon: '👕' },
       ],
-      latestPost: "Capturing the soul of Lisbon on 35mm. There's a magic here you can't find in corporate America. (My rent is paid by my trust.) 🌅",
-      comments: [
-        { author: 'Sage Boheme', text: 'Such soulful work 🤍' },
-        { author: 'Devon\'s Dad', text: 'Devon, please call your mother.' },
+      posts: [
+        { time: '1d', text: "Capturing the soul of Lisbon on 35mm. There's a magic here you can't find in corporate America.\n\n(My rent is paid by my trust.) 🌅",
+          likes: 287, reposts: 14 },
       ],
-      requirements: { looks: 4, charisma: 2, smarts: 0, networking: 1, nepotism: 4 }
+      comments: [
+        { author: 'Sage Boheme',  text: 'Such soulful work 🤍', neg: false },
+        { author: "Devon's Dad",  text: 'Devon, please call your mother.', neg: true },
+      ],
+      requirements: { looks: 4, charisma: 2, smarts: 0, networking: 1, nepotism: 4 },
+      chat: {
+        start: 'open',
+        nodes: {
+          open: {
+            npc: ["heyyy","what's your vibe","i don't really do 'jobs' but i collaborate with kindred souls"],
+            options: [
+              { text: "Cool, I'm pretty kindred.", next: 'maybe' },
+              { text: "I literally need a paying job.", next: 'reject' },
+              { text: "Are you offering one or…?", next: 'reject' },
+            ]
+          },
+          reject: {
+            npc: ["yeah jobs are very colonial of you","best of luck with your hustle ✌️"],
+            end: 'ghosted'
+          },
+          maybe: {
+            npc: ["nice","i'm doing a 'project'","might need someone to carry my film and source vintage cameras","unpaid but you'd be CREDITED"],
+            options: [
+              { text: "I'll pass.", next: 'reject' },
+              { text: "Sure, when?", next: 'flake' },
+            ]
+          },
+          flake: {
+            npc: ["maybe next week","or next month","tbh i'm going to a sound bath in Tulum","ill hit you up","(he won't.)"],
+            end: 'ghosted'
+          },
+        }
+      }
     },
+
   ];
 
   // ────────────────────────────────────────────────────────────────────────
   // BLOCK 3: STATE
   // ────────────────────────────────────────────────────────────────────────
-
   let user = { name: '', stats: {} };
   STAT_DEFS.forEach(s => { user.stats[s.key] = 0; });
 
-  let queue = [];          // Profiles still to be swiped (shuffled copy)
-  let currentIdx = 0;      // Index into queue
-  let currentTab = 0;      // Which info tab is showing on the current card
-  let matches = [];        // Profiles the user matched with
-  let activeView = 'login';
+  let queue       = [];
+  let currentIdx  = 0;
+  let currentTab  = 0;
+  let matches     = []; // { profile, chatLog: [{from,text}], status: 'active'|'success'|'failed'|'ghosted'|'scammed' }
+  let activeView  = 'login';
+  let activeMatchIdx = -1;
+  let expandedPostIdx = -1;
 
-  const CARD_TABS = ['bio', 'interests', 'experience', 'latestPost', 'comments'];
+  const CARD_TABS = ['bio', 'interests', 'experience', 'posts', 'comments'];
 
   // ────────────────────────────────────────────────────────────────────────
   // BLOCK 4: VIEW MANAGEMENT
-  // showView() swaps which top-level <div id="view-..."> is visible
   // ────────────────────────────────────────────────────────────────────────
-
   function showView(name){
     activeView = name;
     ['login','profile','swipe','empty','matches','chat'].forEach(v => {
       const el = document.getElementById('view-' + v);
       if(el) el.style.display = (v === name) ? 'block' : 'none';
     });
-
-    // Header tabs only show after profile creation
     document.getElementById('header-tabs').classList.toggle(
       'visible', ['swipe','empty','matches','chat'].includes(name)
     );
-
-    // Update active tab in header
     document.querySelectorAll('.tab-btn').forEach(btn => {
       const tabName = btn.dataset.tab;
       let isActive = false;
@@ -725,7 +1281,6 @@
     });
   }
 
-  // Header tab clicks
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', function(){
       const tab = this.dataset.tab;
@@ -742,7 +1297,6 @@
   // ────────────────────────────────────────────────────────────────────────
   // BLOCK 5: LOGIN
   // ────────────────────────────────────────────────────────────────────────
-
   document.getElementById('login-form').addEventListener('submit', function(e){
     e.preventDefault();
     user.name = document.getElementById('login-name').value.trim() || 'You';
@@ -751,9 +1305,8 @@
   });
 
   // ────────────────────────────────────────────────────────────────────────
-  // BLOCK 6: PROFILE CREATION (point allocation)
+  // BLOCK 6: PROFILE CREATION
   // ────────────────────────────────────────────────────────────────────────
-
   function renderStatRows(){
     const container = document.getElementById('stat-rows');
     container.innerHTML = '';
@@ -772,13 +1325,11 @@
         + '</div>';
       container.appendChild(row);
     });
-
     container.querySelectorAll('.stat-btn').forEach(btn => {
       btn.addEventListener('click', function(){
         adjustStat(this.dataset.stat, parseInt(this.dataset.dir, 10));
       });
     });
-
     updatePointsDisplay();
   }
 
@@ -790,15 +1341,11 @@
     user.stats[key] = cur + delta;
     updatePointsDisplay();
   }
-
-  function totalSpent(){
-    return Object.values(user.stats).reduce((a,b) => a+b, 0);
-  }
+  function totalSpent(){ return Object.values(user.stats).reduce((a,b) => a+b, 0); }
 
   function updatePointsDisplay(){
     const remaining = STARTING_POINTS - totalSpent();
     document.getElementById('points-remaining').textContent = remaining;
-
     STAT_DEFS.forEach(stat => {
       const pips = document.getElementById('pips-' + stat.key);
       pips.innerHTML = '';
@@ -808,23 +1355,18 @@
         pips.appendChild(pip);
       }
     });
-
-    // Disable +/- when at limits
     document.querySelectorAll('.stat-btn').forEach(btn => {
       const k = btn.dataset.stat;
       const dir = parseInt(btn.dataset.dir, 10);
       if(dir > 0) btn.disabled = (user.stats[k] >= MAX_PER_STAT || remaining <= 0);
       if(dir < 0) btn.disabled = (user.stats[k] <= 0);
     });
-
-    // Enable Finish only when all 10 points spent
     document.getElementById('btn-finish-profile').disabled = (remaining !== 0);
   }
 
   document.getElementById('btn-finish-profile').addEventListener('click', function(){
     queue = shuffle(PROFILES.slice());
-    currentIdx = 0;
-    currentTab = 0;
+    currentIdx = 0; currentTab = 0;
     showView('swipe');
     renderSwipeCard();
   });
@@ -838,10 +1380,8 @@
   }
 
   // ────────────────────────────────────────────────────────────────────────
-  // BLOCK 7: SWIPE FEED RENDERING
-  // The card itself is rebuilt every swipe. Tabs cycle on tap.
+  // BLOCK 7: SWIPE CARD RENDERING
   // ────────────────────────────────────────────────────────────────────────
-
   function renderSwipeCard(){
     const stack = document.getElementById('swipe-stack');
     if(currentIdx >= queue.length){
@@ -850,6 +1390,7 @@
       return;
     }
     currentTab = 0;
+    expandedPostIdx = -1;
     stack.innerHTML = '';
     stack.appendChild(buildCard(queue[currentIdx]));
   }
@@ -859,7 +1400,7 @@
     card.className = 'card';
     card.id = 'active-card';
 
-    // Photo header
+    // Photo
     const photo = document.createElement('div');
     photo.className = 'card-photo';
     photo.innerHTML = '<div style="font-size:5rem;">' + profile.emoji + '</div>'
@@ -867,7 +1408,14 @@
       + '<span>' + escapeHtml(profile.tagline) + '</span></div>';
     card.appendChild(photo);
 
-    // Tab pills
+    // Swipe overlays
+    const likeOv = document.createElement('div');
+    likeOv.className = 'swipe-overlay like'; likeOv.id = 'overlay-like'; likeOv.textContent = 'CONNECT';
+    const nopeOv = document.createElement('div');
+    nopeOv.className = 'swipe-overlay nope'; nopeOv.id = 'overlay-nope'; nopeOv.textContent = 'PASS';
+    card.appendChild(likeOv); card.appendChild(nopeOv);
+
+    // Tabs strip
     const tabs = document.createElement('div');
     tabs.className = 'card-tabs';
     CARD_TABS.forEach((_, i) => {
@@ -877,49 +1425,51 @@
       pill.addEventListener('click', e => {
         e.stopPropagation();
         currentTab = i;
+        expandedPostIdx = -1;
         refreshCardContent(profile);
       });
       tabs.appendChild(pill);
     });
     card.appendChild(tabs);
 
-    // Tab content area (clickable to advance)
+    // Content
     const content = document.createElement('div');
     content.className = 'card-content';
     content.id = 'card-content';
-    content.addEventListener('click', () => {
+    content.addEventListener('click', e => {
+      // Don't advance tab if click was on a post (handled inside)
+      if(e.target.closest('.post-item')) return;
       currentTab = (currentTab + 1) % CARD_TABS.length;
+      expandedPostIdx = -1;
       refreshCardContent(profile);
     });
     card.appendChild(content);
 
-    // Tap hint
-    const hint = document.createElement('div');
-    hint.className = 'tap-hint';
-    hint.textContent = 'Tap to see more';
-    card.appendChild(hint);
-
-    // Initial render
     setTimeout(() => refreshCardContent(profile), 0);
-
+    attachDragHandlers(card);
     return card;
   }
 
   function refreshCardContent(profile){
     const content = document.getElementById('card-content');
     if(!content) return;
-
-    // Sync pills
     document.querySelectorAll('.card-tab-pill').forEach((p, i) => {
       p.classList.toggle('active', i === currentTab);
     });
-
     const tab = CARD_TABS[currentTab];
     let html = '';
 
     if(tab === 'bio'){
-      html = '<div class="card-section-label">Bio</div>'
-           + '<div class="card-section-body"><p>' + escapeHtml(profile.bio) + '</p></div>';
+      html = '<div class="card-section-label">About</div>'
+           + '<div class="card-section-body"><p>' + escapeHtml(profile.bio) + '</p></div>'
+           + '<div class="bio-prompt">'
+           +   '<div class="bio-prompt-q">' + escapeHtml(profile.prompt.q) + '…</div>'
+           +   '<div class="bio-prompt-a">' + escapeHtml(profile.prompt.a) + '</div>'
+           + '</div>'
+           + '<div class="fun-facts"><div class="card-section-label" style="margin-top:1.2rem;">Fun Facts</div>'
+           +   '<ul>'
+           +   profile.funFacts.map(f => '<li>' + escapeHtml(f) + '</li>').join('')
+           +   '</ul></div>';
     }
     else if(tab === 'interests'){
       html = '<div class="card-section-label">Interests</div>'
@@ -941,41 +1491,130 @@
              ).join('')
            + '</div>';
     }
-    else if(tab === 'latestPost'){
-      html = '<div class="card-section-label">Latest Post</div>'
-           + '<div class="card-section-body"><div class="post-card">'
-           +   escapeHtml(profile.latestPost)
-           +   '<div class="post-meta">' + Math.floor(Math.random()*9999) + ' likes · ' + Math.floor(Math.random()*999) + ' reposts</div>'
-           + '</div></div>';
+    else if(tab === 'posts'){
+      html = '<div class="card-section-label">Recent Posts</div>'
+           + '<div class="card-section-body">'
+           + profile.posts.map((p, i) => renderPostItem(p, i)).join('')
+           + '</div>';
     }
     else if(tab === 'comments'){
       html = '<div class="card-section-label">Top Comments</div>'
            + '<div class="card-section-body">'
            + profile.comments.map(c =>
-               '<div class="comment"><span class="comment-author">' + escapeHtml(c.author) + '</span> '
-               + escapeHtml(c.text) + '</div>'
+               '<div class="comment' + (c.neg ? ' negative' : '') + '">'
+               +   '<span class="comment-author">' + escapeHtml(c.author) + '</span> '
+               +   escapeHtml(c.text)
+               + '</div>'
              ).join('')
            + '</div>';
     }
 
     content.innerHTML = html;
+
+    // Attach post click handlers
+    content.querySelectorAll('.post-item').forEach((item, idx) => {
+      item.addEventListener('click', e => {
+        e.stopPropagation();
+        expandedPostIdx = (expandedPostIdx === idx) ? -1 : idx;
+        refreshCardContent(profile);
+      });
+    });
+  }
+
+  function renderPostItem(post, idx){
+    const expanded = expandedPostIdx === idx;
+    return '<div class="post-item' + (expanded ? ' expanded' : '') + '">'
+      + '<div class="post-time">' + escapeHtml(post.time) + ' ago</div>'
+      + (expanded
+          ? '<div class="post-full">' + escapeHtml(post.text).split('\n').map(p => '<p>'+p+'</p>').join('') + '</div>'
+          : '<div class="post-preview">' + escapeHtml(post.text.replace(/\n/g, ' ')) + '</div>')
+      + '<div class="post-meta">'
+      +   '<span>' + post.likes.toLocaleString() + ' likes · ' + post.reposts.toLocaleString() + ' reposts</span>'
+      +   '<span>' + (expanded ? '↑ collapse' : '↓ expand') + '</span>'
+      + '</div></div>';
   }
 
   // ────────────────────────────────────────────────────────────────────────
-  // BLOCK 8: SWIPE LOGIC + MATCH PROBABILITY
-  // Probability = (sum of points met for each requirement) / (sum required)
-  // Capped per-stat at the requirement (e.g. 6/4 still counts as 4/4)
+  // BLOCK 8: DRAG / SWIPE GESTURES
+  // Supports both mouse and touch. Threshold = 100px to commit a swipe.
   // ────────────────────────────────────────────────────────────────────────
+  const SWIPE_THRESHOLD = 100;
+  let drag = null;
 
-  document.getElementById('btn-nope').addEventListener('click', () => swipe('left'));
-  document.getElementById('btn-like').addEventListener('click', () => swipe('right'));
+  function attachDragHandlers(card){
+    card.addEventListener('pointerdown', onDragStart);
+    card.addEventListener('pointermove', onDragMove);
+    card.addEventListener('pointerup',   onDragEnd);
+    card.addEventListener('pointercancel', onDragEnd);
+  }
 
-  function swipe(direction){
+  function onDragStart(e){
+    // Don't drag if user is interacting with content (post, tab pill, etc.)
+    if(e.target.closest('.card-tab-pill')) return;
+    drag = { startX: e.clientX, startY: e.clientY, dx: 0, dy: 0, card: e.currentTarget };
+    drag.card.classList.add('dragging');
+    drag.card.setPointerCapture(e.pointerId);
+  }
+
+  function onDragMove(e){
+    if(!drag) return;
+    drag.dx = e.clientX - drag.startX;
+    drag.dy = e.clientY - drag.startY;
+
+    // Only treat as a swipe if horizontal motion dominates
+    if(Math.abs(drag.dx) < 8 && Math.abs(drag.dy) < 8) return;
+    if(Math.abs(drag.dy) > Math.abs(drag.dx) * 1.4){
+      // It's a vertical scroll — release drag
+      cancelDrag();
+      return;
+    }
+
+    const rotate = drag.dx * 0.05;
+    drag.card.style.transform = 'translate(' + drag.dx + 'px, ' + (drag.dy * 0.3) + 'px) rotate(' + rotate + 'deg)';
+
+    const likeOv = document.getElementById('overlay-like');
+    const nopeOv = document.getElementById('overlay-nope');
+    if(likeOv) likeOv.style.opacity = Math.max(0, Math.min(1, drag.dx / 100));
+    if(nopeOv) nopeOv.style.opacity = Math.max(0, Math.min(1, -drag.dx / 100));
+  }
+
+  function onDragEnd(e){
+    if(!drag) return;
+    drag.card.classList.remove('dragging');
+    if(drag.dx > SWIPE_THRESHOLD)       { commitSwipe('right'); }
+    else if(drag.dx < -SWIPE_THRESHOLD) { commitSwipe('left'); }
+    else                                 { resetCardPosition(); }
+    drag = null;
+  }
+
+  function cancelDrag(){
+    if(!drag) return;
+    drag.card.classList.remove('dragging');
+    resetCardPosition();
+    drag = null;
+  }
+
+  function resetCardPosition(){
+    if(!drag) return;
+    drag.card.style.transform = '';
+    const likeOv = document.getElementById('overlay-like');
+    const nopeOv = document.getElementById('overlay-nope');
+    if(likeOv) likeOv.style.opacity = 0;
+    if(nopeOv) nopeOv.style.opacity = 0;
+  }
+
+  // ────────────────────────────────────────────────────────────────────────
+  // BLOCK 9: SWIPE LOGIC + MATCH PROBABILITY
+  // ────────────────────────────────────────────────────────────────────────
+  document.getElementById('btn-nope').addEventListener('click', () => commitSwipe('left'));
+  document.getElementById('btn-like').addEventListener('click', () => commitSwipe('right'));
+
+  function commitSwipe(direction){
     if(currentIdx >= queue.length) return;
     const profile = queue[currentIdx];
     const card = document.getElementById('active-card');
     if(!card) return;
-
+    card.style.transform = '';
     card.classList.add('swipe-' + direction);
 
     let isMatch = false;
@@ -987,7 +1626,8 @@
     setTimeout(() => {
       currentIdx++;
       if(isMatch){
-        matches.push(profile);
+        const matchEntry = { profile: profile, chatLog: [], status: 'active', currentNode: profile.chat.start };
+        matches.push(matchEntry);
         updateMatchBadge();
         showMatchModal(profile);
       } else {
@@ -1002,14 +1642,12 @@
       total += req[k];
       met   += Math.min(userStats[k] || 0, req[k]);
     });
-    if(total === 0) return 1;        // No requirements = always match
-    return met / total;
+    return total === 0 ? 1 : met / total;
   }
 
   // ────────────────────────────────────────────────────────────────────────
-  // BLOCK 9: MATCH MODAL
+  // BLOCK 10: MATCH MODAL
   // ────────────────────────────────────────────────────────────────────────
-
   let lastMatchProfile = null;
 
   function showMatchModal(profile){
@@ -1022,21 +1660,20 @@
 
   window.closeMatchModal = function(goToMatches){
     document.getElementById('match-modal').classList.remove('visible');
-    if(goToMatches){
-      renderMatches();
-      if(lastMatchProfile) openChat(lastMatchProfile);
-      else { showView('matches'); }
+    if(goToMatches && lastMatchProfile){
+      const idx = matches.findIndex(m => m.profile.id === lastMatchProfile.id);
+      if(idx >= 0) openChat(idx);
     } else {
       renderSwipeCard();
     }
   };
 
   // ────────────────────────────────────────────────────────────────────────
-  // BLOCK 10: MATCHES TAB + CHAT (placeholder)
+  // BLOCK 11: MATCHES TAB
   // ────────────────────────────────────────────────────────────────────────
-
   function updateMatchBadge(){
     const badge = document.getElementById('match-badge');
+    const active = matches.filter(m => m.status === 'active').length;
     if(matches.length > 0){
       badge.textContent = matches.length;
       badge.style.display = 'inline-block';
@@ -1049,42 +1686,173 @@
     const c = document.getElementById('match-list-container');
     if(matches.length === 0){
       c.innerHTML =
-        '<div class="empty-state">'
-        + '<h2>No matches yet.</h2>'
-        + '<p>Keep swiping. The algorithm is fickle. Like dating.</p>'
-        + '</div>';
+        '<div class="empty-state"><h2>No matches yet.</h2>'
+        + '<p>Keep swiping. The algorithm is fickle. Like dating.</p></div>';
       return;
     }
     c.innerHTML = '<div class="match-list">'
-      + matches.map((m, i) =>
-          '<div class="match-item" data-idx="' + i + '">'
-          + '<div class="match-photo">' + m.emoji + '</div>'
-          + '<div class="match-info">'
-          +   '<div class="match-name">' + escapeHtml(m.name) + '</div>'
-          +   '<div class="match-tagline">' + escapeHtml(m.tagline) + '</div>'
-          + '</div>'
-          + '</div>'
-        ).join('')
+      + matches.map((m, i) => {
+          const lastMsg = m.chatLog.length ? m.chatLog[m.chatLog.length-1].text : m.profile.tagline;
+          return '<div class="match-item" data-idx="' + i + '">'
+            + '<div class="match-photo">' + m.profile.emoji + '</div>'
+            + '<div class="match-info">'
+            +   '<div class="match-name">' + escapeHtml(m.profile.name) + '</div>'
+            +   '<div class="match-tagline">' + escapeHtml(lastMsg.slice(0, 60)) + (lastMsg.length > 60 ? '…' : '') + '</div>'
+            + '</div>'
+            + '<div class="match-status ' + m.status + '">' + statusLabel(m.status) + '</div>'
+            + '</div>';
+        }).join('')
       + '</div>';
 
     c.querySelectorAll('.match-item').forEach(item => {
       item.addEventListener('click', function(){
-        openChat(matches[parseInt(this.dataset.idx, 10)]);
+        openChat(parseInt(this.dataset.idx, 10));
       });
     });
   }
 
-  function openChat(profile){
-    document.getElementById('chat-photo').textContent   = profile.emoji;
-    document.getElementById('chat-name').textContent    = profile.name;
-    document.getElementById('chat-tagline').textContent = profile.tagline;
-    showView('chat');
+  function statusLabel(s){
+    return ({
+      active: '• Chat',
+      success: '✓ Hired',
+      failed:  '✗ Burned',
+      ghosted: '… Ghosted',
+      scammed: '$ Scammed',
+    })[s] || s;
   }
 
   // ────────────────────────────────────────────────────────────────────────
-  // BLOCK 11: UTILITIES
+  // BLOCK 12: CHAT — branching dialogue engine
   // ────────────────────────────────────────────────────────────────────────
+  function openChat(matchIdx){
+    activeMatchIdx = matchIdx;
+    const m = matches[matchIdx];
 
+    document.getElementById('chat-photo').textContent   = m.profile.emoji;
+    document.getElementById('chat-name').textContent    = m.profile.name;
+    document.getElementById('chat-tagline').textContent = m.profile.tagline;
+    document.getElementById('chat-end').style.display = 'none';
+
+    showView('chat');
+
+    // First time opening: play intro from start node
+    if(m.chatLog.length === 0){
+      playNode(m, m.profile.chat.start);
+    } else {
+      // Re-render existing log
+      rerenderChatLog(m);
+      if(m.status === 'active'){
+        const node = m.profile.chat.nodes[m.currentNode];
+        renderOptions(m, node);
+      } else {
+        renderEndBanner(m);
+      }
+    }
+  }
+
+  function rerenderChatLog(m){
+    const body = document.getElementById('chat-body');
+    body.innerHTML = '';
+    m.chatLog.forEach(msg => {
+      const div = document.createElement('div');
+      div.className = 'chat-msg ' + msg.from;
+      div.textContent = msg.text;
+      body.appendChild(div);
+    });
+    body.scrollTop = body.scrollHeight;
+  }
+
+  async function playNode(m, nodeId){
+    m.currentNode = nodeId;
+    const node = m.profile.chat.nodes[nodeId];
+    if(!node){ console.warn('missing node', nodeId); return; }
+
+    // Hide options while NPC is "typing"
+    document.getElementById('chat-options').innerHTML = '';
+
+    // NPC sends one or more bubbles
+    if(node.npc){
+      for(let i = 0; i < node.npc.length; i++){
+        await typingDelay(550 + Math.random()*350);
+        const text = node.npc[i];
+        m.chatLog.push({ from: 'npc', text: text });
+        appendBubble('npc', text);
+      }
+    }
+
+    if(node.end){
+      m.status = node.end;
+      updateMatchBadge();
+      renderEndBanner(m);
+    } else {
+      renderOptions(m, node);
+    }
+  }
+
+  function appendBubble(from, text){
+    const body = document.getElementById('chat-body');
+    const div = document.createElement('div');
+    div.className = 'chat-msg ' + from;
+    div.textContent = text;
+    body.appendChild(div);
+    body.scrollTop = body.scrollHeight;
+  }
+
+  async function typingDelay(ms){
+    const body = document.getElementById('chat-body');
+    const ind = document.createElement('div');
+    ind.className = 'chat-typing';
+    ind.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+    body.appendChild(ind);
+    body.scrollTop = body.scrollHeight;
+    await new Promise(r => setTimeout(r, ms));
+    ind.remove();
+  }
+
+  function renderOptions(m, node){
+    const optsEl = document.getElementById('chat-options');
+    optsEl.innerHTML = '';
+    if(!node.options) return;
+    node.options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'chat-option';
+      btn.textContent = opt.text;
+      btn.addEventListener('click', () => {
+        m.chatLog.push({ from: 'user', text: opt.text });
+        appendBubble('user', opt.text);
+        playNode(m, opt.next);
+      });
+      optsEl.appendChild(btn);
+    });
+  }
+
+  function renderEndBanner(m){
+    const banner = document.getElementById('chat-end');
+    banner.className = 'chat-end-banner ' + m.status;
+    banner.style.display = 'block';
+    banner.innerHTML = endBannerContent(m.status, m.profile);
+    document.getElementById('chat-options').innerHTML = '';
+  }
+
+  function endBannerContent(status, profile){
+    if(status === 'success') {
+      return '<strong>✓ Job offer received</strong>You got the role at ' + escapeHtml(profile.experience[0].company) + '. Conversation locked.';
+    }
+    if(status === 'failed') {
+      return '<strong>✗ Burned bridge</strong>You said the wrong thing. ' + escapeHtml(profile.name.split(' ')[0]) + ' will not be hiring you. Conversation locked.';
+    }
+    if(status === 'scammed') {
+      return '<strong>$ You got scammed</strong>You signed up for an MLM/coaching pitch instead of a real job. Conversation locked.';
+    }
+    if(status === 'ghosted') {
+      return '<strong>… Ghosted</strong>It fizzled. No job, no closure. Conversation locked.';
+    }
+    return '<strong>Conversation ended.</strong>';
+  }
+
+  // ────────────────────────────────────────────────────────────────────────
+  // BLOCK 13: UTILITIES
+  // ────────────────────────────────────────────────────────────────────────
   function escapeHtml(s){
     return String(s == null ? '' : s)
       .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
@@ -1092,9 +1860,8 @@
   }
 
   // ────────────────────────────────────────────────────────────────────────
-  // BLOCK 12: INIT
+  // BLOCK 14: INIT
   // ────────────────────────────────────────────────────────────────────────
-
   showView('login');
 
 })();
