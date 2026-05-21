@@ -1,0 +1,169 @@
+Build a modern SaaS web application called “PatientPending”.
+
+CORE IDEA:
+PatientPending is a lightweight intake, referral, and patient request management platform for small independent healthcare providers and specialty practices.
+
+Examples:
+- Orthotics & prosthetics providers
+- Speech pathologists
+- Occupational therapists
+- Physical therapists
+- Mobile clinicians
+- Independent practices
+
+The platform should help providers:
+1. Receive inbound patient requests
+2. Manage referrals
+3. Organize patients in a queue/dashboard
+4. Reduce phone/email chaos
+5. Track outreach and status updates
+
+IMPORTANT:
+This is NOT a full EMR/EHR.
+This is NOT a telehealth app.
+This is NOT insurance billing software.
+Keep it lightweight and simple.
+
+TECH STACK:
+- Next.js
+- TypeScript
+- TailwindCSS
+- Supabase (auth + database)
+- Stripe-ready architecture for future subscriptions
+- Responsive/mobile-friendly UI
+- Clean modern dashboard design
+
+AUTH:
+Two user types:
+1. Providers
+2. Referral sources (optional future role)
+
+Patients do NOT need accounts initially.
+
+LANDING PAGE:
+Create a polished landing page with:
+- Hero section
+- “How it works”
+- Features
+- CTA buttons
+- Simple healthcare/professional aesthetic
+- Brand colors: calming blues/whites/grays
+
+Headline ideas:
+“Modern patient intake for independent practices.”
+“Turn referrals and requests into organized patient workflows.”
+
+CORE MVP FEATURES:
+
+1. PROVIDER DASHBOARD
+After login, providers should see:
+- Total pending requests
+- New referrals
+- Patients contacted
+- Scheduled patients
+- Simple queue/list view
+
+2. PATIENT REQUEST FORM
+Each provider gets a unique public intake link.
+
+Patients can submit:
+- Full name
+- Phone
+- Email
+- Type of service needed
+- Description/reason
+- Preferred contact method
+- Insurance provider (optional)
+- Referral source (optional)
+
+After submission:
+- Request appears instantly in provider dashboard
+- Provider receives email notification
+
+3. REFERRAL SYSTEM
+Allow clinics/providers/doctors to submit referrals to another provider.
+
+Referral form fields:
+- Referring clinic/provider
+- Patient info
+- Reason for referral
+- Urgency level
+- Notes
+
+Dashboard should track:
+- Referral received
+- Contacted
+- Scheduled
+- Closed/completed
+
+4. PATIENT STATUS PIPELINE
+Each patient/referral can move through stages:
+- New
+- Contacted
+- Awaiting response
+- Scheduled
+- Completed
+- Archived
+
+Use draggable Kanban-style columns if possible.
+
+5. SEARCH + FILTERING
+Providers should be able to:
+- Search patients
+- Filter by status
+- Filter by referral type
+- Filter by urgency
+
+6. NOTES SECTION
+Providers can add internal notes to each patient/referral.
+
+7. SIMPLE ANALYTICS
+Dashboard metrics:
+- Number of referrals this month
+- Conversion rate to scheduled
+- Average response time
+
+DESIGN REQUIREMENTS:
+- Extremely simple UX
+- Minimal clicks
+- Professional healthcare feel
+- Prioritize usability over flashy animations
+- Think “modern startup meets medical admin tool”
+
+IMPORTANT ARCHITECTURE NOTES:
+- Build this modularly for future expansion
+- Future features may include:
+  - scheduling integrations
+  - SMS reminders
+  - provider networks
+  - HIPAA-compliant infrastructure
+  - multi-provider practices
+  - AI-assisted intake summaries
+
+But DO NOT implement these yet.
+
+DATABASE MODELS:
+Create sensible schema/models for:
+- Users
+- Providers
+- Patients
+- Referrals
+- Notes
+- Status pipeline
+- Activity log
+
+SECURITY:
+- Basic authentication
+- Protected dashboards
+- Input validation
+- Secure database queries
+
+DO NOT:
+- Add unnecessary complexity
+- Build EMR functionality
+- Build video calling
+- Build prescription features
+- Build insurance claims systems
+
+GOAL:
+The MVP should feel like a real, usable workflow product for a small healthcare practice within 1–2 weeks of development.
