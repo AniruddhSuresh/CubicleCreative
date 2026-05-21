@@ -35,8 +35,9 @@ export default function SignupPage() {
     const { data, error: authError } = await supabase.auth.signUp({
       email: form.email,
       password: form.password,
-      // Store practice info in user metadata so onboarding can read it
       options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        // Store practice info so onboarding can pre-fill from user metadata
         data: {
           practice_name: form.practiceName,
           specialty: form.specialty || null,
@@ -51,7 +52,8 @@ export default function SignupPage() {
     }
 
     if (!data.user) {
-      setError('Signup failed. Please try again.')
+      // Supabase silently returns null user when email already exists (security by design)
+      setError('This email may already be registered. Try signing in instead, or use a different email.')
       setLoading(false)
       return
     }
@@ -97,11 +99,10 @@ export default function SignupPage() {
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Check your email</h1>
           <p className="text-gray-500 mb-6">
-            We sent a confirmation link to <strong>{form.email}</strong>. Click it to activate your account, then sign in.
+            We sent a confirmation link to <strong>{form.email}</strong>. Click it to activate your account — you&apos;ll be brought back here automatically to finish setup.
           </p>
-          <p className="text-sm text-gray-400 bg-gray-100 rounded-lg px-4 py-3">
-            <strong>Tip for development:</strong> Disable email confirmation in your Supabase dashboard under{' '}
-            <strong>Authentication → Email → Confirm email</strong> to skip this step.
+          <p className="text-sm text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-4 py-3">
+            <strong>Don&apos;t see it?</strong> Check your spam folder. The link expires in 24 hours.
           </p>
           <Link href="/login" className="inline-block mt-6 text-blue-600 font-medium hover:underline text-sm">
             Go to sign in →
